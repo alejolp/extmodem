@@ -27,16 +27,21 @@
 
 namespace extmodem {
 
+class modem;
+
 class hdlc {
 public:
-	hdlc();
+	hdlc(modem* em);
 	virtual ~hdlc();
 
 	void rxbit(int bit);
-	void ax25_disp_packet(unsigned char *bp, unsigned int len);
+	void ax25_print_packet(unsigned char *bp, unsigned int len);
+	void ax25_dispatch_packet(unsigned char *bp, unsigned int len);
 
 	std::string get_name() const { return name_; }
 	void set_name(const std::string& s) { name_ = s; }
+
+	modem* get_modem_instance() const { return em_; }
 
 private:
 	struct l2_state_hdlc {
@@ -50,6 +55,7 @@ private:
 	void init();
 
 	std::string name_;
+	modem* em_;
 };
 
 } /* namespace extmodem */

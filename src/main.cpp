@@ -36,18 +36,18 @@ using namespace extmodem;
 
 int main(int argc, char **argv) {
 	int i;
-	::extmodem::extmodem e;
+	boost::shared_ptr<modem> em(new modem());
 	boost::shared_ptr<audiosource> as(new audiosource_portaudio(SAMPLE_RATE));
 
-	e.set_audiosource(as);
+	em->set_audiosource(as);
 
 	for (i = 0; i < 1 /* as->get_channel_count() */; ++i) {
-		e.add_decoder(decoder_ptr(new decoder_dtmf()), i);
-		e.add_decoder(decoder_ptr(new decoder_af1200mm()), i);
-		e.add_decoder(decoder_ptr(new decoder_af1200stj()), i);
+		em->add_decoder(decoder_ptr(new decoder_dtmf(em.get())), i);
+		em->add_decoder(decoder_ptr(new decoder_af1200mm(em.get())), i);
+		em->add_decoder(decoder_ptr(new decoder_af1200stj(em.get())), i);
 	}
 
-	e.start();
+	em->start_and_run();
 
 	for (;;) {
 		Pa_Sleep(1000);

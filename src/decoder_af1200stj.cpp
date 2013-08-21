@@ -169,11 +169,11 @@ namespace {
 	  return std::floor(d + 0.5);
 	}
 }
-decoder_af1200stj::decoder_af1200stj() {}
+decoder_af1200stj::decoder_af1200stj(modem* em) : em_(em) {}
 decoder_af1200stj::~decoder_af1200stj() {}
 
 void decoder_af1200stj::init(audiosource* a) {
-	states_.resize(2);
+	states_.resize(2, demod_state(em_));
 	init_state(a, 0, 0, 1);
 	init_state(a, 1, 6, 1);
 }

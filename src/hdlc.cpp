@@ -31,6 +31,7 @@
 
 #include "hdlc.h"
 #include "multimon_utils.h"
+#include "extmodem.h"
 
 
 namespace extmodem {
@@ -83,7 +84,7 @@ static inline int check_crc_ccitt(const unsigned char *buf, int cnt)
 
 }
 
-hdlc::hdlc() {
+hdlc::hdlc(modem* em) : em_(em) {
 	name_ = "AFSK1200";
 	init();
 }
@@ -101,7 +102,7 @@ void hdlc::rxbit(int bit) {
 	hdlc_.rxbitstream |= !!bit;
 	if ((hdlc_.rxbitstream & 0xff) == 0x7e) {
 		if (hdlc_.rxstate && (hdlc_.rxptr - hdlc_.rxbuf) > 2)
-			ax25_disp_packet(hdlc_.rxbuf, hdlc_.rxptr - hdlc_.rxbuf);
+			ax25_dispatch_packet(hdlc_.rxbuf, hdlc_.rxptr - hdlc_.rxbuf);
 		hdlc_.rxstate = 1;
 		hdlc_.rxptr = hdlc_.rxbuf;
 		hdlc_.rxbitbuf = 0x80;
@@ -130,7 +131,16 @@ void hdlc::rxbit(int bit) {
 	hdlc_.rxbitbuf >>= 1;
 }
 
-void hdlc::ax25_disp_packet(unsigned char *bp, unsigned int len)
+void hdlc::ax25_dispatch_packet(unsigned char *bp, unsigned int len) {
+	if (!check_crc_ccitt(bp, len))
+		return;
+
+	ax25_print_packet(bp, len);
+
+	em_->dispatch_packet(bp, len);
+}
+
+void hdlc::ax25_print_packet(unsigned char *bp, unsigned int len)
 {
 	unsigned char v1 = 1, cmd = 0;
 	unsigned char i, j;
@@ -140,7 +150,7 @@ void hdlc::ax25_disp_packet(unsigned char *bp, unsigned int len)
 	if (!bp || len < 10)
 		return;
 
-#if 1
+#if 0
 	if (!check_crc_ccitt(bp, len))
 		return;
 #endif

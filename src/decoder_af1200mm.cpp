@@ -68,7 +68,7 @@ namespace {
 
 }
 
-decoder_af1200mm::decoder_af1200mm() {
+decoder_af1200mm::decoder_af1200mm(modem* em) : hdlc_(em) {
 	float f;
 	int i;
 

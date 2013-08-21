@@ -25,23 +25,23 @@
 
 namespace extmodem {
 
-extmodem::extmodem() {
+modem::modem() {
 }
 
-extmodem::~extmodem() {
+modem::~modem() {
 }
 
-void extmodem::set_audiosource(audiosource_ptr p) {
+void modem::set_audiosource(audiosource_ptr p) {
 	audio_source_ = p;
 	decoders_.resize(p->get_channel_count());
 }
 
-void extmodem::add_decoder(decoder_ptr p, int ch_num) {
+void modem::add_decoder(decoder_ptr p, int ch_num) {
 	decoders_[ch_num].push_back(p);
 	p->init(audio_source_.get());
 }
 
-void extmodem::input_callback(audiosource* a, const float* buffer, unsigned long length) {
+void modem::input_callback(audiosource* a, const float* buffer, unsigned long length) {
 	int channel_count = a->get_channel_count();
 	int ch_idx, k, deco_idx;
 
@@ -68,7 +68,17 @@ void extmodem::input_callback(audiosource* a, const float* buffer, unsigned long
 	}
 }
 
-void extmodem::start() {
+void modem::start_and_run() {
 	audio_source_->set_listener(this);
+
+	tcpserver_.run();
 }
+
+void modem::dispatch_packet(unsigned char *bp, unsigned int len) {
+
+}
+
+
+
+
 } /* namespace extmodem */

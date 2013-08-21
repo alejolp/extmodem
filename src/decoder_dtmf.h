@@ -26,9 +26,11 @@
 
 namespace extmodem {
 
+class modem;
+
 class decoder_dtmf : public decoder {
 public:
-	explicit decoder_dtmf();
+	explicit decoder_dtmf(modem* em);
 	virtual ~decoder_dtmf();
 
 	virtual void input_callback(audiosource* a, const float* buffer, unsigned long length);
@@ -43,6 +45,8 @@ private:
 	} dtmf;
 
 	int process_block();
+
+	modem* em_;
 };
 
 } /* namespace extmodem */

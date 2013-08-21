@@ -76,7 +76,7 @@ namespace {
 }
 
 
-decoder_dtmf::decoder_dtmf() {
+decoder_dtmf::decoder_dtmf(modem* em) : em_(em) {
 	std::memset(&dtmf, 0, sizeof(dtmf));
 }
 

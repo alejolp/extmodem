@@ -33,7 +33,7 @@ namespace extmodem {
 
 class decoder_af1200stj : public decoder {
 public:
-	decoder_af1200stj();
+	decoder_af1200stj(modem* em);
 	virtual ~decoder_af1200stj();
 
 	virtual void input_callback(audiosource* a, const float* input, unsigned long frameCount);
@@ -44,6 +44,7 @@ private:
 	void input_callback_state(audiosource* a, const float* buffer, unsigned long length, int state_idx);
 
 	struct demod_state {
+		demod_state(modem* em) : hdlc_(em) {}
 		int rate_index;
 		int sample_rate;
 		int samples_per_bit;
@@ -74,6 +75,7 @@ private:
 		hdlc hdlc_;
 	};
 	std::vector<demod_state> states_;
+	modem* em_;
 };
 
 } /* namespace extmodem */

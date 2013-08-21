@@ -38,7 +38,7 @@ namespace extmodem {
  */
 class decoder_af1200mm : public decoder {
 public:
-	decoder_af1200mm();
+	decoder_af1200mm(modem* em);
 	virtual ~decoder_af1200mm();
 
 	virtual void input_callback(audiosource* a, const float* input, unsigned long frameCount);

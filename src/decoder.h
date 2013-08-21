@@ -24,9 +24,9 @@
 
 #include <vector>
 
-
 namespace extmodem {
 
+class modem;
 class audiosource;
 
 class decoder {

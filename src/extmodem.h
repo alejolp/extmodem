@@ -26,6 +26,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "audiosource.h"
+#include "tcpserver.h"
 
 
 namespace extmodem {
@@ -36,17 +37,18 @@ typedef boost::shared_ptr<decoder> decoder_ptr;
 //class audiosource;
 typedef boost::shared_ptr<audiosource> audiosource_ptr;
 
-class extmodem : public audiosourcelistener {
+class modem : public audiosourcelistener {
 public:
-	extmodem();
-	virtual ~extmodem();
+	modem();
+	virtual ~modem();
 
 	void set_audiosource(audiosource_ptr p);
 	void add_decoder(decoder_ptr p, int ch_num);
 
 	virtual void input_callback(audiosource* a, const float* input, unsigned long frameCount);
 
-	void start();
+	void start_and_run();
+	void dispatch_packet(unsigned char *bp, unsigned int len);
 
 private:
 	audiosource_ptr audio_source_;
@@ -56,6 +58,7 @@ private:
 
 private:
 	std::vector<float> tmpdata;
+	tcpserver tcpserver_;
 };
 
 } /* namespace extmodem */
