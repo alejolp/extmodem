@@ -100,7 +100,7 @@ void decoder_af1200mm::input_callback(audiosource* a, const float* buffer, unsig
 	/*
 	 * "mm" codec need a relatively huge chuck of contiguous samples to work reliably.
 	 * "SAMPLE_RATE" seems OK. The downside is that having a large buffer introduces
-	 * a delay proportional to the sample rate.
+	 * a delay proportional to the sample rate. It also helps having a buffer of even size.
 	 */
 
 	unsigned long min_buffer_size = a->get_sample_rate(); // a buffer of 1 second of samples.
@@ -108,8 +108,15 @@ void decoder_af1200mm::input_callback(audiosource* a, const float* buffer, unsig
 	tmp_inbuffer_.insert(tmp_inbuffer_.end(), buffer, buffer + length);
 
 	if (tmp_inbuffer_.size() >= min_buffer_size) {
-		input_callback_real(a, tmp_inbuffer_.data(), tmp_inbuffer_.size());
-		tmp_inbuffer_.clear();
+		if ((tmp_inbuffer_.size() % 2) == 0) {
+			input_callback_real(a, tmp_inbuffer_.data(), tmp_inbuffer_.size());
+			tmp_inbuffer_.clear();
+		} else {
+			float last_sample = tmp_inbuffer_[tmp_inbuffer_.size() - 1];
+			input_callback_real(a, tmp_inbuffer_.data(), tmp_inbuffer_.size() - 1);
+			tmp_inbuffer_.clear();
+			tmp_inbuffer_.push_back(last_sample);
+		}
 	}
 }
 
