@@ -132,12 +132,15 @@ void hdlc::rxbit(int bit) {
 }
 
 void hdlc::ax25_dispatch_packet(unsigned char *bp, unsigned int len) {
+
 	if (!check_crc_ccitt(bp, len))
 		return;
 
 	ax25_print_packet(bp, len);
 
-	em_->dispatch_packet(bp, len);
+	// The "bp" buffer contains the CRC at the end!
+
+	em_->dispatch_packet(bp, len - 2);
 }
 
 void hdlc::ax25_print_packet(unsigned char *bp, unsigned int len)
