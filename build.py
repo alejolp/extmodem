@@ -29,6 +29,8 @@ EXECUTABLE = 'extmodem'
 
 def main():
     objs = []
+    if not os.path.exists(OBJ_DIR):
+        os.mkdir(OBJ_DIR)
     for f in FILES:
         out_bin_path = os.path.join(OBJ_DIR, \
             os.path.basename(f[:f.rfind('.')] + ".o"))

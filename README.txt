@@ -1,10 +1,34 @@
 
-extmodem: Sound card modem for Amateur Radio AX25.
+extmodem
+========
+
+Sound card modem for Amateur Radio AX25.
+
+Build and install
+=================
+
+On linux systems you can compile with g++ using the "build.py" script. You need:
+
+ - Python to run the build script
+ - Boost C++ library development files
+ - PortAudio library development files
+
+On Debian and Ubuntu you can install the required packages easily:
+
+  aptitude install build-essential g++ libportaudio-dev libboost-system-dev libboost-thread-dev
+
+Then just type, at the "extmodem" directory:
+
+  python build.py
+
+The executable should be at bin/extradio
 
 Licence
 =======
 
-Copyright (C) Alejandro Santos LU4EXT, 2013, alejolp@gmail.com.
+This code borrows code from Sivan Toledo's javAX25 and Thomas Sailer's multimon. Thank you folks!
+
+Copyright (C) 2013 Alejandro Santos LU4EXT, alejolp@gmail.com.
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
