@@ -48,7 +48,7 @@ public:
 	virtual void input_callback(audiosource* a, const float* input, unsigned long frameCount);
 
 	void start_and_run();
-	void dispatch_packet(unsigned char *bp, unsigned int len);
+	void dispatch_packet(unsigned char *buffer, std::size_t length);
 
 private:
 	audiosource_ptr audio_source_;

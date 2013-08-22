@@ -9,6 +9,8 @@
 #include <iostream>
 
 #include "tcpserver.h"
+#include "kiss.h"
+
 
 namespace extmodem {
 
@@ -161,7 +163,6 @@ void kiss_session::handle_close() {
 
 void kiss_session::handle_connect() {
 	std::cout << "connect, hay clientes: " << get_server()->get_clients().size() << std::endl;
-	get_server()->write_to_all("nuevo\n", 6);
 }
 
 basic_asio_session* kiss_server::new_session_instance(boost::asio::io_service& io_service_) {
@@ -187,5 +188,32 @@ void tcpserver::run() {
 		std::cerr << "Exception: " << e.what() << "\n";
 	}
 }
+
+void tcpserver::flush_output_queue() {
+	boost::lock_guard<boost::mutex> guard_(output_queue_mutex_);
+
+	while (!output_queue_.empty()) {
+		std::vector<unsigned char> &data = output_queue_.front();
+		std::vector<char> kiss_data;
+		kiss_encode(data.data(), data.size(), &kiss_data);
+		kiss_srv_.write_to_all(kiss_data.data(), kiss_data.size());
+		output_queue_.pop_front();
+	}
+}
+
+void tcpserver::write_to_all_safe(const unsigned char* buffer, std::size_t length) {
+	write_to_all_safe(std::vector<unsigned char>(buffer, buffer + length));
+}
+
+void tcpserver::write_to_all_safe(const std::vector<unsigned char>& buffer) {
+	{
+		boost::lock_guard<boost::mutex> guard_(output_queue_mutex_);
+		output_queue_.push_back(buffer);
+	}
+
+	io_service_.dispatch(boost::bind(&tcpserver::flush_output_queue, this));
+}
+
+
 
 } /* namespace extmodem */

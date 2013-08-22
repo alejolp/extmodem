@@ -74,8 +74,8 @@ void modem::start_and_run() {
 	tcpserver_.run();
 }
 
-void modem::dispatch_packet(unsigned char *bp, unsigned int len) {
-
+void modem::dispatch_packet(unsigned char *buffer, std::size_t length) {
+	tcpserver_.write_to_all_safe(buffer, length);
 }
 
 

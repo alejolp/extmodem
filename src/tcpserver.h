@@ -13,6 +13,8 @@
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
+
 
 namespace extmodem {
 
@@ -111,11 +113,17 @@ public:
 	virtual ~tcpserver();
 
 	void run();
+	void write_to_all_safe(const unsigned char* buffer, std::size_t length);
+	void write_to_all_safe(const std::vector<unsigned char>& buffer);
 
 private:
+	void flush_output_queue();
+
 	boost::asio::io_service io_service_;
 
 	kiss_server kiss_srv_;
+	boost::mutex output_queue_mutex_;
+	std::deque<std::vector<unsigned char> > output_queue_;
 };
 
 } /* namespace extmodem */
