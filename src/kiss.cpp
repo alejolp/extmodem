@@ -21,11 +21,28 @@
 
 #include "kiss.h"
 
+/*
+ * KISS specs:
+ *  - http://www.ka9q.net/papers/kiss.html
+ *  - http://www.ax25.net/kiss.aspx
+ */
+
 namespace extmodem {
 
 void kiss_encode(const unsigned char* buffer, std::size_t length, std::vector<char> *dst) {
+	unsigned char frame_type;
+
 	dst->reserve(length+2);
 	dst->push_back(KISS_FEND);
+
+	/*  the first byte of each asynchronous frame between host and TNC is a "type" indicator */
+	/*
+		Command        Function         Comments
+		   0           Data frame       The  rest  of the frame is data to
+										be sent on the HDLC channel.
+	 */
+	frame_type = 0;
+	dst->push_back(frame_type);
 
 	for (std::size_t k = 0; k < length; ++k) {
 		if (buffer[k] == KISS_FEND) {

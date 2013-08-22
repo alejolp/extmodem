@@ -27,6 +27,8 @@
 #ifndef DECODER_AF1200MM_H_
 #define DECODER_AF1200MM_H_
 
+#include <vector>
+
 #include "decoder.h"
 #include "hdlc.h"
 
@@ -44,6 +46,8 @@ public:
 	virtual void input_callback(audiosource* a, const float* input, unsigned long frameCount);
 
 private:
+	void input_callback_real(audiosource* a, const float* input, unsigned long frameCount);
+
 	struct l1_state_afsk12 {
 		unsigned int dcd_shreg;
 		unsigned int sphase;
@@ -52,6 +56,7 @@ private:
 	} afsk12;
 
 	hdlc hdlc_;
+	std::vector<float> tmp_inbuffer_;
 };
 
 } /* namespace extmodem */

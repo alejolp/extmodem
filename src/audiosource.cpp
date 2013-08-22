@@ -70,12 +70,7 @@ void audiosource_portaudio::init() {
 		std::cerr << "device " << api_idx << ": " << info->name << std::endl;
 	}
 
-	// For the "mm" decoder to work, the frames_per_buffer value should be
-	// relatively high. "SAMPLE_RATE" seems OK. The downside is that having a
-	// large buffer introduces a delay proportional to the sample rate.
-	//
-
-	int frames_per_buffer = get_sample_rate(); /* paFramesPerBufferUnspecified */
+	int frames_per_buffer = paFramesPerBufferUnspecified; /* get_sample_rate(); */ /* paFramesPerBufferUnspecified */
 
     /* Open an audio I/O stream. */
     err = Pa_OpenDefaultStream( &stream,

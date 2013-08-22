@@ -36,6 +36,7 @@
 
 #include "decoder_af1200mm.h"
 #include "multimon_utils.h"
+#include "audiosource.h"
 
 
 namespace extmodem {
@@ -95,6 +96,24 @@ decoder_af1200mm::~decoder_af1200mm() {
 }
 
 void decoder_af1200mm::input_callback(audiosource* a, const float* buffer, unsigned long length) {
+
+	/*
+	 * "mm" codec need a relatively huge chuck of contiguous samples to work reliably.
+	 * "SAMPLE_RATE" seems OK. The downside is that having a large buffer introduces
+	 * a delay proportional to the sample rate.
+	 */
+
+	unsigned long min_buffer_size = a->get_sample_rate(); // a buffer of 1 second of samples.
+
+	tmp_inbuffer_.insert(tmp_inbuffer_.end(), buffer, buffer + length);
+
+	if (tmp_inbuffer_.size() >= min_buffer_size) {
+		input_callback_real(a, tmp_inbuffer_.data(), tmp_inbuffer_.size());
+		tmp_inbuffer_.clear();
+	}
+}
+
+void decoder_af1200mm::input_callback_real(audiosource* a, const float* buffer, unsigned long length) {
 	float f;
 	unsigned char curbit;
 
