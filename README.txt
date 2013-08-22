@@ -11,11 +11,11 @@ On linux systems you can compile with g++ using the "build.py" script. You need:
 
  - Python to run the build script
  - Boost C++ library development files
- - PortAudio library development files
+ - PortAudio VERSION 19 library development files
 
 On Debian and Ubuntu you can install the required packages easily:
 
-  aptitude install build-essential g++ libportaudio-dev libboost-system-dev libboost-thread-dev
+  aptitude install build-essential g++ portaudio19-dev libboost-system-dev libboost-thread-dev
 
 Then just type, at the "extmodem" directory:
 
