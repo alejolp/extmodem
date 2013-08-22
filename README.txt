@@ -9,6 +9,18 @@ Sound card modem for Amateur Radio AX25.
 Build and install
 =================
 
+GET THE SOURCE CODE:
+--------------------
+
+On your terminal write:
+
+  git clone https://github.com/alejolp/extmodem.git
+
+The source code should be at the "extmodem" directory.
+
+COMPILE:
+--------
+
 On linux systems you can compile with g++ using the "build.py" script. You need:
 
  - Python to run the build script
