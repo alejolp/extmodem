@@ -2,6 +2,8 @@
 extmodem
 ========
 
+  http://extradio.sourceforge.net/extmodem.html
+
 Sound card modem for Amateur Radio AX25.
 
 Build and install
@@ -23,10 +25,25 @@ Then just type, at the "extmodem" directory:
 
 The executable should be at bin/extradio
 
+Usage
+=====
+
+The program prints the received packets on the screen.
+
+It also opens a TCP KISS interface running at port 6666. You can use any TCP KISS capable program
+to receive packets, ie "aprx":
+
+  <interface>
+    tcp-device 127.0.0.1 6666 KISS
+    callsign LU0EXT-1
+    tx-ok false
+  </interface>
+
+
 Licence
 =======
 
-This code borrows code from Sivan Toledo's javAX25 and Thomas Sailer's multimon. Thank you folks!
+This program borrows code from Sivan Toledo's javAX25 and Thomas Sailer's multimon. Thank you folks!
 
 Copyright (C) 2013 Alejandro Santos LU4EXT, alejolp@gmail.com.
 
