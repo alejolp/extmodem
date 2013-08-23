@@ -31,6 +31,10 @@
  */
 
 
+#ifdef _MSC_VER 
+#define _USE_MATH_DEFINES
+#endif
+
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -161,7 +165,7 @@ namespace {
 
 	float round(float d)
 	{
-	  return std::floor(d + 0.5);
+	  return (float)std::floor(d + 0.5);
 	}
 
 	double round(double d)
@@ -194,7 +198,7 @@ void decoder_af1200stj::init_state(audiosource* a, int state_idx, int emphasis, 
 		}
 	}
 
-	s.samples_per_bit = (float) s.sample_rate / 1200.0f;
+	s.samples_per_bit = (int)((float) s.sample_rate / 1200.0f);
 	s.emphasis = emphasis;
 	s.filter_index = filter_index;
 
@@ -242,11 +246,11 @@ void decoder_af1200stj::input_callback_state(audiosource* a, const float* buffer
 		s.c1_imag[s.j_corr] = s.x[s.j_td] * (float) std::sin(s.phase_f1);
 
 		s.phase_f0 += s.phase_inc_f0;
-		if (s.phase_f0 > (float) 2.0 * M_PI)
-			s.phase_f0 -= (float) 2.0 * M_PI;
+		if (s.phase_f0 > (float) (2.0 * M_PI))
+			s.phase_f0 -= (float) (2.0 * M_PI);
 		s.phase_f1 += s.phase_inc_f1;
-		if (s.phase_f1 > (float) 2.0 * M_PI)
-			s.phase_f1 -= (float) 2.0 * M_PI;
+		if (s.phase_f1 > (float) (2.0 * M_PI))
+			s.phase_f1 -= (float) (2.0 * M_PI);
 
 		float cr = sum(s.c0_real, s.j_corr);
 		float ci = sum(s.c0_imag, s.j_corr);

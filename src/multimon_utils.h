@@ -31,7 +31,7 @@
 #ifndef MULTIMON_UTILS_H_
 #define MULTIMON_UTILS_H_
 
-extern const float costabf[0x400];
+extern float costabf[0x400];
 
 #define COS(x) costabf[(((x)>>6)&0x3ffu)]
 #define SIN(x) COS((x)+0xc000)
