@@ -66,7 +66,7 @@ namespace {
 			}
 		if (idx < 0)
 			return -1;
-		en *= 0.1;
+		en *= 0.1f;
 		for (i = 0; i < 4; i++)
 			if (idx != i && f[i] > en)
 				return -1;

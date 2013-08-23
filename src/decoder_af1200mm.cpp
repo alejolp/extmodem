@@ -30,6 +30,9 @@
  */
 
 #include <cstring>
+#ifdef _MSC_VER 
+#define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 #include <iostream>
 
@@ -81,12 +84,12 @@ decoder_af1200mm::decoder_af1200mm(modem* em) : hdlc_(em) {
 		for (f = 0, i = 0; i < CORRLEN; i++) {
 			corr_mark_i[i] = std::cos(f);
 			corr_mark_q[i] = std::sin(f);
-			f += 2.0*M_PI*FREQ_MARK/FREQ_SAMP;
+			f += (float)(2.0*M_PI*FREQ_MARK/FREQ_SAMP);
 		}
 		for (f = 0, i = 0; i < CORRLEN; i++) {
 			corr_space_i[i] = std::cos(f);
 			corr_space_q[i] = std::sin(f);
-			f += 2.0*M_PI*FREQ_SPACE/FREQ_SAMP;
+			f += (float)(2.0*M_PI*FREQ_SPACE/FREQ_SAMP);
 		}
 	}
 }

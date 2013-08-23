@@ -39,6 +39,8 @@ int main(int argc, char **argv) {
 	boost::shared_ptr<modem> em(new modem());
 	boost::shared_ptr<audiosource> as(new audiosource_portaudio(SAMPLE_RATE));
 
+	std::cerr << "Starting extmodem ... " << std::endl;
+
 	em->set_audiosource(as);
 
 	for (i = 0; i < 1 /* as->get_channel_count() */; ++i) {
@@ -46,6 +48,8 @@ int main(int argc, char **argv) {
 		em->add_decoder(decoder_ptr(new decoder_af1200mm(em.get())), i);
 		em->add_decoder(decoder_ptr(new decoder_af1200stj(em.get())), i);
 	}
+
+	std::cerr << "Started" << std::endl;
 
 	em->start_and_run();
 
