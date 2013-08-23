@@ -6,13 +6,24 @@ extmodem
 
 Sound card modem for Amateur Radio AX25.
 
-Build and install
-=================
+Windows Files:
+==============
 
-GET THE SOURCE CODE:
---------------------
+Precompiled Windows binaries (EXE) can be found here:
 
-On your terminal write:
+  http://sourceforge.net/projects/extradio/files/extmodem/
+
+You may need the VC++ 2010 runtime, available here:
+
+  http://www.microsoft.com/en-us/download/details.aspx?id=5555
+
+Build from source:
+==================
+
+LINUX, GET THE SOURCE CODE:
+---------------------------
+
+On your Linux terminal write:
 
   git clone https://github.com/alejolp/extmodem.git
 
@@ -21,7 +32,7 @@ The source code should be at the "extmodem" directory.
 COMPILE:
 --------
 
-On linux systems you can compile with g++ using the "build.py" script. You need:
+On Linux systems you can compile with g++ using the "build.py" script. You need:
 
  - Python to run the build script
  - Boost C++ library development files
