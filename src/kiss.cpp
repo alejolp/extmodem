@@ -29,7 +29,7 @@
 
 namespace extmodem {
 
-void kiss_encode(const unsigned char* buffer, std::size_t length, std::vector<char> *dst) {
+void kiss_encode(const unsigned char* buffer, std::size_t length, std::vector<unsigned char> *dst) {
 	unsigned char frame_type;
 
 	dst->reserve(length+2);
@@ -64,6 +64,32 @@ void kiss_encode(const unsigned char* buffer, std::size_t length, std::vector<ch
 	dst->push_back((char)KISS_FEND);
 }
 
+int kiss_decode(const unsigned char* buffer, std::size_t length, std::vector<unsigned char>* dst) {
+	if (length < 2 || buffer[0] != KISS_FEND || buffer[length-1] != KISS_FEND)
+		return 0;
+
+	for (std::size_t k = 1; k < length - 1; ++k) {
+		if (buffer[k] == KISS_FESC) {
+			if (buffer[k+1] == KISS_TFEND) {
+				dst->push_back(KISS_FEND);
+				++k;
+			} else {
+				return 0; // ERROR
+			}
+		} else if (buffer[k] == KISS_FESC) {
+			if (buffer[k+1] == KISS_TFESC) {
+				dst->push_back(KISS_FESC);
+				++k;
+			} else {
+				return 0; // ERROR
+			}
+		} else {
+			dst->push_back(buffer[k]);
+		}
+	}
+
+	return 1; // OK
+}
 
 }
 

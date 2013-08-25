@@ -23,6 +23,7 @@
 
 #include "tcpserver.h"
 #include "kiss.h"
+#include "extmodem.h"
 
 
 namespace extmodem {
@@ -37,8 +38,8 @@ void basic_asio_session::start() {
 	handle_connect();
 }
 
-void basic_asio_session::write(const char* buffer, std::size_t length) {
-	out_data_queue_.push_back(std::vector<char>(buffer, buffer + length));
+void basic_asio_session::write(const unsigned char* buffer, std::size_t length) {
+	out_data_queue_.push_back(std::vector<unsigned char>(buffer, buffer + length));
 	start_write();
 }
 
@@ -57,7 +58,7 @@ void basic_asio_session::start_write() {
 		if (!waiting_write_) {
 			waiting_write_ = true;
 
-			std::vector<char> &front = out_data_queue_.front();
+			std::vector<unsigned char> &front = out_data_queue_.front();
 
 			boost::asio::async_write(socket_,
 					boost::asio::buffer(front.data(), front.size()),
@@ -154,7 +155,7 @@ void basic_asio_server::session_closed(basic_asio_session* s) {
 	clients_.erase(s);
 }
 
-void basic_asio_server::write_to_all(const char* buffer, std::size_t length) {
+void basic_asio_server::write_to_all(const unsigned char* buffer, std::size_t length) {
 	std::set<basic_asio_session*>::iterator it;
 
 	for (it = clients_.begin(); it != clients_.end(); ++it) {
@@ -166,16 +167,61 @@ void basic_asio_server::write_to_all(const char* buffer, std::size_t length) {
 /**********************************************/
 /* KISS */
 
-void kiss_session::handle_incoming_data(const char* buffer, std::size_t length) {
+void kiss_session::handle_incoming_data(const unsigned char* buffer, std::size_t length) {
 	std::cout << "data: " << length << std::endl;
+	inbuff_.insert(inbuff_.end(), buffer, buffer + length);
+
+	unsigned int i = 0, start, end, last_good_pos = -1;
+
+	/*
+	 * A KISS frame begins and ends with a KISS_FEND, not having any KISS_FEND in the middle.
+	 */
+
+	while (i < inbuff_.size()) {
+		for (; i < inbuff_.size(); ++i)
+			if (inbuff_[i] == KISS_FEND)
+				break;
+
+		last_good_pos = i - 1;
+
+		if (i < inbuff_.size() && inbuff_[i] == KISS_FEND) {
+			start = i;
+			i++;
+
+			for (; i < inbuff_.size(); ++i)
+				if (inbuff_[i] == KISS_FEND)
+					break;
+
+			if (i < inbuff_.size() && inbuff_[i] == KISS_FEND) {
+				// Found a KISS frame.
+				end = i;
+				last_good_pos = i;
+				i++;
+				frame_ptr new_frame(new frame());
+				kiss_decode(inbuff_.data() + start, end - start + 1, &(new_frame->get_data()));
+
+				std::cout << "NEW FRAME FROM TCP " << start << ", " << end << std::endl;
+				new_frame->print();
+
+				get_kiss_server()->get_modem()->output_packet_to_sc(new_frame);
+			}
+		}
+	}
+
+	inbuff_.erase(inbuff_.begin(), inbuff_.begin() + last_good_pos + 1);
+
 }
 
 void kiss_session::handle_close() {
-	std::cout << "close" << std::endl;
+	//std::cout << "close" << std::endl;
 }
 
 void kiss_session::handle_connect() {
-	std::cout << "connect, hay clientes: " << get_server()->get_clients().size() << std::endl;
+	//std::cout << "connect, hay clientes: " << get_server()->get_clients().size() << std::endl;
+}
+
+kiss_server* kiss_session::get_kiss_server() {
+	 return dynamic_cast<kiss_server*>(get_server());
 }
 
 basic_asio_session* kiss_server::new_session_instance(boost::asio::io_service& io_service_) {
@@ -185,7 +231,7 @@ basic_asio_session* kiss_server::new_session_instance(boost::asio::io_service& i
 /**********************************************/
 /* tcpserver */
 
-tcpserver::tcpserver() : kiss_srv_(io_service_, 6666) {
+tcpserver::tcpserver(modem* em) : kiss_srv_(io_service_, 6666, em) {
 
 }
 
@@ -206,14 +252,26 @@ void tcpserver::flush_output_queue() {
 	boost::lock_guard<boost::mutex> guard_(output_queue_mutex_);
 
 	while (!output_queue_.empty()) {
-		std::vector<unsigned char> &data = output_queue_.front();
-		std::vector<char> kiss_data;
-		kiss_encode(data.data(), data.size(), &kiss_data);
-		kiss_srv_.write_to_all(kiss_data.data(), kiss_data.size());
+		frame_ptr fp = output_queue_.front();
+		std::vector<unsigned char> kiss_data;
+
 		output_queue_.pop_front();
+
+		kiss_encode(fp->get_data().data(), fp->get_data().size(), &kiss_data);
+		kiss_srv_.write_to_all(kiss_data.data(), kiss_data.size());
 	}
 }
 
+void tcpserver::write_to_all_safe(frame_ptr fp) {
+	{
+		boost::lock_guard<boost::mutex> guard_(output_queue_mutex_);
+		output_queue_.push_back(fp);
+	}
+
+	io_service_.dispatch(boost::bind(&tcpserver::flush_output_queue, this));
+}
+
+/*
 void tcpserver::write_to_all_safe(const unsigned char* buffer, std::size_t length) {
 	write_to_all_safe(std::vector<unsigned char>(buffer, buffer + length));
 }
@@ -226,7 +284,7 @@ void tcpserver::write_to_all_safe(const std::vector<unsigned char>& buffer) {
 
 	io_service_.dispatch(boost::bind(&tcpserver::flush_output_queue, this));
 }
-
+*/
 
 
 } /* namespace extmodem */

@@ -16,7 +16,8 @@ FILES=['./src/decoder_af1200mm.cpp',
     './src/main.cpp',
     './src/hdlc.cpp',
     './src/decoder.cpp',
-    './src/audiosource.cpp']
+    './src/audiosource.cpp',
+    './src/frame.cpp']
 OBJ_DIR = 'bin'
 CC = 'g++'
 CFLAGS = '-O3 -Wall'

@@ -44,6 +44,7 @@ class audiosource;
 class audiosourcelistener {
 public:
 	virtual void input_callback(audiosource* a, const float* input, unsigned long frameCount) = 0;
+	virtual void output_callback(audiosource* a, float* buffer, unsigned long length) = 0;
 };
 
 class audiosource {
@@ -55,7 +56,8 @@ public:
 	audiosourcelistener* get_listener() const { return listener_; }
 
 	int get_sample_rate() const { return sample_rate_; }
-	int get_channel_count() const { return 2; }
+	int get_in_channel_count() const { return 2; }
+	int get_out_channel_count() const { return 2; }
 
 private:
 	int sample_rate_;
@@ -72,7 +74,8 @@ private:
 	void close();
 
 private:
-	PaStream *stream;
+	PaStream *stream_in;
+	PaStream *stream_out;
 	PaError err;
 };
 

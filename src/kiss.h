@@ -37,7 +37,8 @@
 
 namespace extmodem {
 
-void kiss_encode(const unsigned char* buffer, std::size_t length, std::vector<char>* dst);
+void kiss_encode(const unsigned char* buffer, std::size_t length, std::vector<unsigned char>* dst);
+int kiss_decode(const unsigned char* buffer, std::size_t length, std::vector<unsigned char>* dst);
 
 }
 

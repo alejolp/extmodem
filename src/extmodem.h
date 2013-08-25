@@ -27,12 +27,16 @@
 
 #include "audiosource.h"
 #include "tcpserver.h"
+#include "frame.h"
 
 
 namespace extmodem {
 
 class decoder;
 typedef boost::shared_ptr<decoder> decoder_ptr;
+
+class encoder;
+typedef boost::shared_ptr<encoder> encoder_ptr;
 
 //class audiosource;
 typedef boost::shared_ptr<audiosource> audiosource_ptr;
@@ -45,16 +49,33 @@ public:
 	void set_audiosource(audiosource_ptr p);
 	void add_decoder(decoder_ptr p, int ch_num);
 
+	void set_encoder(encoder_ptr p);
+	encoder_ptr get_encoder() { return encoder_; }
+
 	virtual void input_callback(audiosource* a, const float* input, unsigned long frameCount);
+	virtual void output_callback(audiosource* a, float* buffer, unsigned long length);
 
 	void start_and_run();
-	void dispatch_packet(unsigned char *buffer, std::size_t length);
+
+	/** Handle a new packet that comes from the sound card.
+	 *
+	 * @param fp
+	 */
+	void dispatch_packet(frame_ptr fp);
+
+	/** Send a new packet to the sound card.
+	 *
+	 * @param fp
+	 */
+	void output_packet_to_sc(frame_ptr fp);
 
 private:
 	audiosource_ptr audio_source_;
 
 	/** decoders_ is a vector of vectors, the outer vector is indexed b channel, the inner vector is indexed by decoder. */
 	std::vector<std::vector<decoder_ptr> > decoders_;
+
+	encoder_ptr encoder_;
 
 private:
 	std::vector<float> tmpdata;

@@ -25,7 +25,9 @@
 #include "decoder_dtmf.h"
 #include "decoder_af1200mm.h"
 #include "decoder_af1200stj.h"
+#include "encoder_af1200stj.h"
 
+#include "frame.h"
 
 #include <boost/smart_ptr.hpp>
 
@@ -48,6 +50,8 @@ int main(int argc, char **argv) {
 		em->add_decoder(decoder_ptr(new decoder_af1200mm(em.get())), i);
 		em->add_decoder(decoder_ptr(new decoder_af1200stj(em.get())), i);
 	}
+
+	em->set_encoder(encoder_ptr(new encoder_af1200stj()));
 
 	std::cerr << "Started" << std::endl;
 

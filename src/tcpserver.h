@@ -28,10 +28,14 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 
+#include "frame.h"
+
 
 namespace extmodem {
 
 class basic_asio_server;
+class kiss_server;
+class modem;
 
 class basic_asio_session {
 public:
@@ -45,12 +49,12 @@ public:
 	basic_asio_server* get_server() { return server_; }
 
 	void start();
-	void write(const char* buffer, std::size_t length);
+	void write(const unsigned char* buffer, std::size_t length);
 
 protected:
 	virtual void handle_connect();
 	virtual void handle_close();
-	virtual void handle_incoming_data(const char* buffer, std::size_t length) = 0;
+	virtual void handle_incoming_data(const unsigned char* buffer, std::size_t length) = 0;
 
 private:
 	void start_read();
@@ -66,8 +70,8 @@ private:
 		max_length = 4096
 	};
 	basic_asio_server* server_;
-	char in_data_[max_length];
-	std::deque<std::vector<char> > out_data_queue_;
+	unsigned char in_data_[max_length];
+	std::deque<std::vector<unsigned char> > out_data_queue_;
 	bool waiting_write_;
 	bool waiting_read_;
 	bool closing_;
@@ -83,7 +87,7 @@ public:
 
 	std::set<basic_asio_session*>& get_clients() { return clients_; }
 
-	void write_to_all(const char* buffer, std::size_t length);
+	void write_to_all(const unsigned char* buffer, std::size_t length);
 
 protected:
 	virtual basic_asio_session* new_session_instance(boost::asio::io_service& io_service_) = 0;
@@ -105,29 +109,40 @@ public:
 protected:
 	virtual void handle_connect();
 	virtual void handle_close();
-	virtual void handle_incoming_data(const char* buffer, std::size_t length);
+	virtual void handle_incoming_data(const unsigned char* buffer, std::size_t length);
 
+	kiss_server* get_kiss_server();
+
+private:
+	std::vector<unsigned char> inbuff_;
 };
 
 class kiss_server : public basic_asio_server {
 public:
-	explicit kiss_server(boost::asio::io_service& io_service, short port) : basic_asio_server(io_service, port) {}
+	explicit kiss_server(boost::asio::io_service& io_service, short port, modem* em) : basic_asio_server(io_service, port), em_(em) {}
 	virtual ~kiss_server() {}
+
+	modem* get_modem() { return em_; }
 
 protected:
 	virtual basic_asio_session* new_session_instance(boost::asio::io_service& io_service_);
 
+private:
+	modem* em_;
 };
 
 
 class tcpserver {
 public:
-	tcpserver();
+	tcpserver(modem* em);
 	virtual ~tcpserver();
 
 	void run();
+	/*
 	void write_to_all_safe(const unsigned char* buffer, std::size_t length);
 	void write_to_all_safe(const std::vector<unsigned char>& buffer);
+	 */
+	void write_to_all_safe(frame_ptr fp);
 
 private:
 	void flush_output_queue();
@@ -136,7 +151,7 @@ private:
 
 	kiss_server kiss_srv_;
 	boost::mutex output_queue_mutex_;
-	std::deque<std::vector<unsigned char> > output_queue_;
+	std::deque<frame_ptr> output_queue_;
 };
 
 } /* namespace extmodem */

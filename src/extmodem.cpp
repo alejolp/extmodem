@@ -18,14 +18,17 @@
  *      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <iostream>
 
 #include "audiosource.h"
 #include "decoder.h"
+#include "encoder.h"
+
 #include "extmodem.h"
 
 namespace extmodem {
 
-modem::modem() {
+modem::modem() : tcpserver_(this) {
 }
 
 modem::~modem() {
@@ -33,7 +36,7 @@ modem::~modem() {
 
 void modem::set_audiosource(audiosource_ptr p) {
 	audio_source_ = p;
-	decoders_.resize(p->get_channel_count());
+	decoders_.resize(p->get_in_channel_count());
 }
 
 void modem::add_decoder(decoder_ptr p, int ch_num) {
@@ -41,8 +44,14 @@ void modem::add_decoder(decoder_ptr p, int ch_num) {
 	p->init(audio_source_.get());
 }
 
+void modem::set_encoder(encoder_ptr p) {
+	encoder_ = p;
+	p->init(audio_source_.get());
+}
+
+
 void modem::input_callback(audiosource* a, const float* buffer, unsigned long length) {
-	int channel_count = a->get_channel_count();
+	int channel_count = a->get_in_channel_count();
 	int ch_idx, k, deco_idx;
 
 	if (channel_count == 1) {
@@ -68,17 +77,27 @@ void modem::input_callback(audiosource* a, const float* buffer, unsigned long le
 	}
 }
 
+void modem::output_callback(audiosource* a, float* buffer, unsigned long length) {
+	// int channel_count = a->get_out_channel_count();
+
+	if (encoder_.get()) {
+		encoder_->output_callback(audio_source_.get(), buffer, length);
+	}
+}
+
 void modem::start_and_run() {
 	audio_source_->set_listener(this);
 
 	tcpserver_.run();
 }
 
-void modem::dispatch_packet(unsigned char *buffer, std::size_t length) {
-	tcpserver_.write_to_all_safe(buffer, length);
+void modem::dispatch_packet(frame_ptr fp) {
+	tcpserver_.write_to_all_safe(fp);
 }
 
-
+void modem::output_packet_to_sc(frame_ptr fp) {
+	encoder_->send(fp);
+}
 
 
 } /* namespace extmodem */

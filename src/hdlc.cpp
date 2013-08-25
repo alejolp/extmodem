@@ -73,15 +73,6 @@ static const unsigned short crc_ccitt_table[] = {
         0x7bc7, 0x6a4e, 0x58d5, 0x495c, 0x3de3, 0x2c6a, 0x1ef1, 0x0f78
 };
 
-static inline int check_crc_ccitt(const unsigned char *buf, int cnt)
-{
-        unsigned int crc = 0xffff;
-
-        for (; cnt > 0; cnt--)
-                crc = (crc >> 8) ^ crc_ccitt_table[(crc ^ *buf++) & 0xff];
-        return (crc & 0xffff) == 0xf0b8;
-}
-
 }
 
 hdlc::hdlc(modem* em) : em_(em) {
@@ -136,14 +127,34 @@ void hdlc::ax25_dispatch_packet(unsigned char *bp, unsigned int len) {
 	if (!check_crc_ccitt(bp, len))
 		return;
 
-	ax25_print_packet(bp, len);
+	ax25_print_packet(bp, len, name_.c_str());
+
+	unsigned int crc = *((unsigned short*)(&bp[len - 2]));
 
 	// The "bp" buffer contains the CRC at the end!
+	frame_ptr new_frame(new frame(bp, len - 2, crc));
 
-	em_->dispatch_packet(bp, len - 2);
+	em_->dispatch_packet(new_frame);
 }
 
-void hdlc::ax25_print_packet(unsigned char *bp, unsigned int len)
+int check_crc_ccitt(const unsigned char *buf, int cnt) {
+	unsigned int crc = 0xffff;
+
+	for (; cnt > 0; cnt--)
+		crc = (crc >> 8) ^ crc_ccitt_table[(crc ^ *buf++) & 0xff];
+	return (crc & 0xffff) == 0xf0b8;
+}
+
+int calc_crc_ccitt(const unsigned char *buf, int cnt) {
+	unsigned int crc = 0xffff;
+
+	for (; cnt > 0; cnt--)
+		crc = (crc >> 8) ^ crc_ccitt_table[(crc ^ *buf++) & 0xff];
+	crc ^= 0xffff;
+	return (crc & 0xffff);
+}
+
+void ax25_print_packet(unsigned char *bp, unsigned int len, const char* name)
 {
 	unsigned char v1 = 1, cmd = 0;
 	unsigned char i, j;
@@ -174,7 +185,7 @@ void hdlc::ax25_print_packet(unsigned char *bp, unsigned int len)
 		 */
 		v1 = 0;
 		cmd = (bp[1] & 2) != 0;
-		verbprintf(0, "%s: fm ? to ", name_.c_str());
+		verbprintf(0, "%s: fm ? to ", name);
 		i = (bp[2] >> 2) & 0x3f;
 		if (i)
 			verbprintf(0, "%c", i + 0x20);
@@ -207,7 +218,7 @@ void hdlc::ax25_print_packet(unsigned char *bp, unsigned int len)
 			v1 = 0;
 			cmd = (bp[6] & 0x80);
 		}
-		verbprintf(0, "%s: fm ", name_.c_str());
+		verbprintf(0, "%s: fm ", name);
 		for (i = 7; i < 13; i++)
 			if ((bp[i] & 0xfe) != 0x40)
 				verbprintf(0, "%c", bp[i] >> 1);
