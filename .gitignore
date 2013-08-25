@@ -13,6 +13,9 @@ local.properties
 .settings/
 .loadpath
 
+# vim backups
+*~
+
 # External tool builders
 .externalToolBuilders/
 
