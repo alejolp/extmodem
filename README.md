@@ -53,13 +53,11 @@ The program prints the received packets on the screen.
 It also opens a TCP KISS interface running at port 6666. You can use any TCP KISS capable program
 to receive packets, ie "aprx":
 
-<pre>
-  <interface>
-    tcp-device 127.0.0.1 6666 KISS
-    callsign LU0EXT-1
-    tx-ok false
-  </interface>
-</pre>
+    <interface>
+      tcp-device 127.0.0.1 6666 KISS
+      callsign LU0EXT-1
+      tx-ok false
+    </interface>
 
 License
 -------
