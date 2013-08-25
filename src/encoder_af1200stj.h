@@ -15,6 +15,7 @@
 #include <boost/smart_ptr.hpp>
 
 #include "encoder.h"
+#include "ptt.h"
 
 
 namespace extmodem {
@@ -46,6 +47,7 @@ private:
 
 	std::deque<buffer_ptr> out_queue_;
 	std::size_t out_queue_ptr_;
+	ptt_ptr ptt_;
 };
 
 } /* namespace extmodem */

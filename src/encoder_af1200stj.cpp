@@ -62,6 +62,9 @@ void encoder_af1200stj::output_callback(audiosource* a, float* buffer, unsigned 
 
 	// std::cout << " out callback " << buffer_size << std::endl;
 
+	if (!out_queue_.empty() && !ptt_->get_tx())
+		ptt_->set_tx(1);
+
 	if (num_channels >= 1) {
 		i = 0;
 
@@ -87,6 +90,8 @@ void encoder_af1200stj::output_callback(audiosource* a, float* buffer, unsigned 
 	while (i < buffer_size)
 		buffer[i++] = 0;
 
+	if (out_queue_.empty() && ptt_->get_tx())
+		ptt_->set_tx(0);
 }
 
 void encoder_af1200stj::init(audiosource* a) {
@@ -95,6 +100,9 @@ void encoder_af1200stj::init(audiosource* a) {
 	phase_inc_f0 = (float) (2.0*M_PI*1200.0/sample_rate_);
 	phase_inc_f1 = (float) (2.0*M_PI*2200.0/sample_rate_);
 	phase_inc_symbol = (float) (2.0*M_PI*1200.0/sample_rate_);
+
+	ptt_.reset(new ptt_serial_unix());
+	ptt_->init("/dev/ttyUSB0");
 }
 
 void encoder_af1200stj::generateSymbolSamples(int symbol) {
