@@ -60,7 +60,7 @@ to receive packets, ie "aprx":
   </interface>
 
 
-Licence
+License
 -------
 
 This program borrows code from Sivan Toledo's javAX25 and Thomas Sailer's multimon. Thank you folks!
