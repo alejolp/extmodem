@@ -29,7 +29,7 @@ namespace extmodem {
 
 class modem;
 
-void ax25_print_packet(unsigned char *bp, unsigned int len, const char* name);
+void ax25_print_packet(unsigned char *bp, unsigned int len, const char* name, int has_crc);
 int check_crc_ccitt(const unsigned char *buf, int cnt);
 int calc_crc_ccitt(const unsigned char *buf, int cnt);
 

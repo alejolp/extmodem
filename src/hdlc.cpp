@@ -127,7 +127,7 @@ void hdlc::ax25_dispatch_packet(unsigned char *bp, unsigned int len) {
 	if (!check_crc_ccitt(bp, len))
 		return;
 
-	ax25_print_packet(bp, len, name_.c_str());
+	ax25_print_packet(bp, len, name_.c_str(), 1);
 
 	unsigned int crc = *((unsigned short*)(&bp[len - 2]));
 
@@ -154,7 +154,7 @@ int calc_crc_ccitt(const unsigned char *buf, int cnt) {
 	return (crc & 0xffff);
 }
 
-void ax25_print_packet(unsigned char *bp, unsigned int len, const char* name)
+void ax25_print_packet(unsigned char *bp, unsigned int len, const char* name, int has_crc)
 {
 	unsigned char v1 = 1, cmd = 0;
 	unsigned char i, j;
@@ -176,8 +176,13 @@ void ax25_print_packet(unsigned char *bp, unsigned int len, const char* name)
 	verbprintf(0, "\n");
 #endif
 
-	len -= 2;
-	int crc = *((unsigned short*)&bp[len]);
+	int crc;
+	if (has_crc) {
+		len -= 2;
+		crc = *((unsigned short*)&bp[len]);
+	} else {
+		crc = calc_crc_ccitt(bp, len);
+	}
 
 	if (bp[1] & 1) {
 		/*

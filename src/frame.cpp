@@ -19,7 +19,7 @@ frame::~frame() {
 }
 
 void frame::print() {
-	ax25_print_packet(data_.data(), data_.size(), "AF1200");
+	ax25_print_packet(data_.data(), data_.size(), "AF1200", 0);
 }
 
 

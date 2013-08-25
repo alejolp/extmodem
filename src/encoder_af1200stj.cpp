@@ -184,8 +184,8 @@ void encoder_af1200stj::send(frame_ptr fp) {
 	// CRC
 	int crc = calc_crc_ccitt(buffer.data(), buffer.size());
 
-	byteToSymbols(crc & 0xFF, true);
-	byteToSymbols((crc >> 8) & 0xFF, true);
+	byteToSymbols((crc & 0xFF), true);
+	byteToSymbols(((crc >> 8) & 0xFF), true);
 
 	// Tail
 	for (k = 0; k < tx_tail; ++k)

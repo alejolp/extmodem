@@ -29,6 +29,12 @@
 
 namespace extmodem {
 
+/** Encodes a KISS data frame.
+ *
+ * @param buffer
+ * @param length
+ * @param dst
+ */
 void kiss_encode(const unsigned char* buffer, std::size_t length, std::vector<unsigned char> *dst) {
 	unsigned char frame_type;
 
@@ -64,11 +70,17 @@ void kiss_encode(const unsigned char* buffer, std::size_t length, std::vector<un
 	dst->push_back((char)KISS_FEND);
 }
 
+/** Decodes a KISS data frame.
+ *
+ * @param buffer
+ * @param length
+ * @param dst
+ */
 int kiss_decode(const unsigned char* buffer, std::size_t length, std::vector<unsigned char>* dst) {
-	if (length < 2 || buffer[0] != KISS_FEND || buffer[length-1] != KISS_FEND)
+	if (length < 3 || buffer[0] != KISS_FEND || buffer[length-1] != KISS_FEND || (buffer[1] & 0x0F) != 0)
 		return 0;
 
-	for (std::size_t k = 1; k < length - 1; ++k) {
+	for (std::size_t k = 2; k < length - 1; ++k) {
 		if (buffer[k] == KISS_FESC) {
 			if (buffer[k+1] == KISS_TFEND) {
 				dst->push_back(KISS_FEND);
