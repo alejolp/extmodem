@@ -1,13 +1,12 @@
 
-extmodem
-========
+Sound card modem for Amateur Radio AX25
+=================================================
 
-  http://extradio.sourceforge.net/extmodem.html
+Web page:  http://extradio.sourceforge.net/extmodem.html
 
-Sound card modem for Amateur Radio AX25.
 
-Windows Files:
-==============
+Windows Files
+-------------
 
 Precompiled Windows binaries (EXE) can be found here:
 
@@ -17,11 +16,10 @@ You may need the VC++ 2010 runtime, available here:
 
   http://www.microsoft.com/en-us/download/details.aspx?id=5555
 
-Build from source:
-==================
+Build from source
+-----------------
 
-LINUX, GET THE SOURCE CODE:
----------------------------
+### Linux, get the source
 
 On your Linux terminal write:
 
@@ -29,8 +27,7 @@ On your Linux terminal write:
 
 The source code should be at the "extmodem" directory.
 
-COMPILE:
---------
+### Compile
 
 On Linux systems you can compile with g++ using the "build.py" script. You need:
 
@@ -49,7 +46,7 @@ Then just type, at the "extmodem" directory:
 The executable should be at bin/extradio
 
 Usage
-=====
+-----
 
 The program prints the received packets on the screen.
 
@@ -64,7 +61,7 @@ to receive packets, ie "aprx":
 
 
 Licence
-=======
+-------
 
 This program borrows code from Sivan Toledo's javAX25 and Thomas Sailer's multimon. Thank you folks!
 
