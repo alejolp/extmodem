@@ -170,7 +170,7 @@ void encoder_af1200stj::send(frame_ptr fp) {
 	tx_last_symbol = 0;
 	tx_stuff_count = 0;
 
-	std::size_t tx_delay = 10, tx_tail = 5;
+	std::size_t tx_delay = 30, tx_tail = 15;
 
 	out.reset(new std::vector<float>());
 
