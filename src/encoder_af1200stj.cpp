@@ -64,14 +64,23 @@ void encoder_af1200stj::output_callback(audiosource* a, float* buffer, unsigned 
 
 	// std::cout << " out callback " << buffer_size << std::endl;
 
-	if (!out_queue_.empty() && !ptt_->get_tx())
-		ptt_->set_tx(1);
+	{
+		boost::lock_guard<boost::mutex> guard_(out_queue_mutex_);
+		if (!out_queue_.empty() && !ptt_->get_tx())
+			ptt_->set_tx(1);
+	}
 
 	if (num_channels >= 1) {
 		i = 0;
 
-		while (!out_queue_.empty() && i < buffer_size) {
-			buffer_ptr p = out_queue_.front();
+		while (i < buffer_size) {
+			buffer_ptr p;
+			{
+				boost::lock_guard<boost::mutex> guard_(out_queue_mutex_);
+				if (out_queue_.empty())
+					break;
+				p = out_queue_.front();
+			}
 
 			// std::cout << " out quedan " << out_queue_.size() << " tope de " << p->size() << std::endl;
 
@@ -82,7 +91,9 @@ void encoder_af1200stj::output_callback(audiosource* a, float* buffer, unsigned 
 				}
 				out_queue_ptr_++;
 			}
+
 			if (out_queue_ptr_ == p->size()) {
+				boost::lock_guard<boost::mutex> guard_(out_queue_mutex_);
 				out_queue_.pop_front();
 				out_queue_ptr_ = 0;
 			}
@@ -92,8 +103,11 @@ void encoder_af1200stj::output_callback(audiosource* a, float* buffer, unsigned 
 	while (i < buffer_size)
 		buffer[i++] = 0;
 
-	if (out_queue_.empty() && ptt_->get_tx())
-		ptt_->set_tx(0);
+	{
+		boost::lock_guard<boost::mutex> guard_(out_queue_mutex_);
+		if (out_queue_.empty() && ptt_->get_tx())
+			ptt_->set_tx(0);
+	}
 }
 
 void encoder_af1200stj::init(audiosource* a) {
@@ -167,6 +181,13 @@ void encoder_af1200stj::send(frame_ptr fp) {
 	std::size_t k;
 	std::vector<unsigned char> &buffer = fp->get_data();
 
+	{
+		boost::lock_guard<boost::mutex> guard_(out_queue_mutex_);
+		// FIXME: Do something more interesting than silently dropping the frame.
+		if (out_queue_.size() > 5)
+			return;
+	}
+
 	tx_symbol_phase = tx_dds_phase = 0.0f;
 	tx_last_symbol = 0;
 	tx_stuff_count = 0;
@@ -205,6 +226,7 @@ void encoder_af1200stj::send(frame_ptr fp) {
 	for (k = out->size(); ((out->size() - k) * 1000) / sample_rate_ < tx_tail; )
 		byteToSymbols(0x7E, false);
 
+	boost::lock_guard<boost::mutex> guard_(out_queue_mutex_);
 	out_queue_.push_back(out);
 	out.reset();
 }

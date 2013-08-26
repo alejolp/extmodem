@@ -13,6 +13,7 @@
 #include <cstdlib>
 
 #include <boost/smart_ptr.hpp>
+#include <boost/thread.hpp>
 
 #include "encoder.h"
 #include "ptt.h"
@@ -46,6 +47,7 @@ private:
 	buffer_ptr out;
 
 	std::deque<buffer_ptr> out_queue_;
+	boost::mutex out_queue_mutex_;
 	std::size_t out_queue_ptr_;
 	ptt_ptr ptt_;
 };
