@@ -20,11 +20,12 @@ FILES=['./src/decoder_af1200mm.cpp',
     './src/frame.cpp',
     './src/encoder.cpp',
     './src/encoder_af1200stj.cpp',
-    './src/ptt.cpp']
+    './src/ptt.cpp',
+    './src/extconfig.cpp']
 OBJ_DIR = 'bin'
 CC = 'g++'
 CFLAGS = '-O3 -Wall'
-LDFLAGS = '-lportaudio -lboost_system'
+LDFLAGS = '-lportaudio -lboost_system -lboost_program_options'
 EXECUTABLE = 'extmodem'
 JOBS_COUNT = multiprocessing.cpu_count()
 

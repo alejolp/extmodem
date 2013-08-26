@@ -24,6 +24,7 @@
 #include "tcpserver.h"
 #include "kiss.h"
 #include "extmodem.h"
+#include "extconfig.h"
 
 
 namespace extmodem {
@@ -233,7 +234,7 @@ basic_asio_session* kiss_server::new_session_instance(boost::asio::io_service& i
 /**********************************************/
 /* tcpserver */
 
-tcpserver::tcpserver(modem* em) : kiss_srv_(io_service_, 6666, em) {
+tcpserver::tcpserver(modem* em) : kiss_srv_(io_service_, config::Instance()->kiss_tcp_port(), em) {
 
 }
 

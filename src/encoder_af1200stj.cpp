@@ -40,6 +40,7 @@
 
 #include "hdlc.h"
 #include "audiosource.h"
+#include "extconfig.h"
 
 #include "encoder_af1200stj.h"
 
@@ -103,7 +104,7 @@ void encoder_af1200stj::init(audiosource* a) {
 	phase_inc_symbol = (float) (2.0*M_PI*1200.0/sample_rate_);
 
 	ptt_.reset(new ptt_serial_unix());
-	ptt_->init("/dev/ttyUSB0");
+	ptt_->init(config::Instance()->ptt_port().c_str());
 }
 
 void encoder_af1200stj::generateSymbolSamples(int symbol) {
@@ -170,12 +171,12 @@ void encoder_af1200stj::send(frame_ptr fp) {
 	tx_last_symbol = 0;
 	tx_stuff_count = 0;
 
-	std::size_t tx_delay = 30, tx_tail = 15;
+	std::size_t tx_delay = config::Instance()->tx_delay(), tx_tail = config::Instance()->tx_tail();
 
 	out.reset(new std::vector<float>());
 
 	// Preamble
-	for (k = 0; k < tx_delay; ++k)
+	for (k = out->size(); ((out->size() - k) * 1000) / sample_rate_ < tx_delay; )
 		byteToSymbols(0x7E, false);
 
 	// Data
@@ -201,7 +202,7 @@ void encoder_af1200stj::send(frame_ptr fp) {
 #endif
 
 	// Tail
-	for (k = 0; k < tx_tail; ++k)
+	for (k = out->size(); ((out->size() - k) * 1000) / sample_rate_ < tx_tail; )
 		byteToSymbols(0x7E, false);
 
 	out_queue_.push_back(out);

@@ -21,6 +21,7 @@
 
 #include "audiosource.h"
 #include "extmodem.h"
+#include "extconfig.h"
 
 #include "decoder_dtmf.h"
 #include "decoder_af1200mm.h"
@@ -37,6 +38,14 @@ using namespace extmodem;
 #define SAMPLE_RATE 22050
 
 int main(int argc, char **argv) {
+	config* cfg = config::Instance();
+
+	cfg->init(argc, argv);
+
+	if (cfg->is_help()) {
+		return 0;
+	}
+
 	int i;
 	boost::shared_ptr<modem> em(new modem());
 	boost::shared_ptr<audiosource> as(new audiosource_portaudio(SAMPLE_RATE));
