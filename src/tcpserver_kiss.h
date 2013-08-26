@@ -18,45 +18,48 @@
  *      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef TCPSERVER_H_
-#define TCPSERVER_H_
+#ifndef TCPSERVER_KISS_H_
+#define TCPSERVER_KISS_H_
 
-#include <deque>
-
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
-#include <boost/thread.hpp>
-#include <boost/shared_ptr.hpp>
-
-#include "frame.h"
-
+#include "tcpserver_base.h"
 
 namespace extmodem {
 
 class kiss_server;
 class modem;
 
-class tcpserver {
+class kiss_session : public basic_asio_session {
 public:
-	tcpserver(modem* em);
-	virtual ~tcpserver();
+	explicit kiss_session(boost::asio::io_service& io_service, basic_asio_server* server) : basic_asio_session(io_service, server) {}
+	virtual ~kiss_session() {}
 
-	void run();
-	/*
-	void write_to_all_safe(const unsigned char* buffer, std::size_t length);
-	void write_to_all_safe(const std::vector<unsigned char>& buffer);
-	 */
-	void write_to_all_safe(frame_ptr fp);
+protected:
+	virtual void handle_connect();
+	virtual void handle_close();
+	virtual void handle_incoming_data(const unsigned char* buffer, std::size_t length);
+
+	kiss_server* get_kiss_server();
 
 private:
-	void flush_output_queue();
-
-	boost::asio::io_service io_service_;
-
-	boost::shared_ptr<kiss_server> kiss_srv_;
-	boost::mutex output_queue_mutex_;
-	std::deque<frame_ptr> output_queue_;
+	std::vector<unsigned char> inbuff_;
 };
 
-} /* namespace extmodem */
-#endif /* TCPSERVER_H_ */
+class kiss_server : public basic_asio_server {
+public:
+	explicit kiss_server(boost::asio::io_service& io_service, short port, modem* em) : basic_asio_server(io_service, port), em_(em) {}
+	virtual ~kiss_server() {}
+
+	modem* get_modem() { return em_; }
+
+protected:
+	virtual basic_asio_session* new_session_instance(boost::asio::io_service& io_service_);
+
+private:
+	modem* em_;
+};
+
+}
+
+
+#endif
+
