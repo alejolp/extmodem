@@ -61,6 +61,7 @@ private:
 	std::string ptt_port_;
 	int tx_delay_;
 	int tx_tail_;
+	bool debug_;
 };
 
 } /* namespace extmodem */
