@@ -81,11 +81,16 @@
     <ClCompile Include="..\src\decoder_af1200mm.cpp" />
     <ClCompile Include="..\src\decoder_af1200stj.cpp" />
     <ClCompile Include="..\src\decoder_dtmf.cpp" />
+    <ClCompile Include="..\src\encoder.cpp" />
+    <ClCompile Include="..\src\encoder_af1200stj.cpp" />
+    <ClCompile Include="..\src\extconfig.cpp" />
     <ClCompile Include="..\src\extmodem.cpp" />
+    <ClCompile Include="..\src\frame.cpp" />
     <ClCompile Include="..\src\hdlc.cpp" />
     <ClCompile Include="..\src\kiss.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\multimon_utils.cpp" />
+    <ClCompile Include="..\src\ptt.cpp" />
     <ClCompile Include="..\src\tcpserver.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -94,10 +99,15 @@
     <ClInclude Include="..\src\decoder_af1200mm.h" />
     <ClInclude Include="..\src\decoder_af1200stj.h" />
     <ClInclude Include="..\src\decoder_dtmf.h" />
+    <ClInclude Include="..\src\encoder.h" />
+    <ClInclude Include="..\src\encoder_af1200stj.h" />
+    <ClInclude Include="..\src\extconfig.h" />
     <ClInclude Include="..\src\extmodem.h" />
+    <ClInclude Include="..\src\frame.h" />
     <ClInclude Include="..\src\hdlc.h" />
     <ClInclude Include="..\src\kiss.h" />
     <ClInclude Include="..\src\multimon_utils.h" />
+    <ClInclude Include="..\src\ptt.h" />
     <ClInclude Include="..\src\tcpserver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

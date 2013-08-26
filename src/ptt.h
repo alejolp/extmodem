@@ -23,12 +23,20 @@
 
 #include <boost/shared_ptr.hpp>
 
+#ifdef _MSC_VER
+#include <windows.h>
+#include <winioctl.h>
+#endif
+
 namespace extmodem {
 
 class ptt;
 typedef boost::shared_ptr<ptt> ptt_ptr;
 
 class ptt {
+public:
+	static ptt_ptr factory();
+
 public:
 	ptt();
 	virtual ~ptt();
@@ -38,6 +46,26 @@ public:
 	virtual int get_tx() = 0;
 };
 
+#ifdef _MSC_VER
+class ptt_serial_windows: public ptt {
+public:
+	ptt_serial_windows() : hnd_(INVALID_HANDLE_VALUE) {}
+	virtual ~ptt_serial_windows();
+
+	virtual int init(const char* fname);
+	virtual void set_tx(int tx);
+	virtual int get_tx();
+
+	void set_dtr(int tx);
+	void set_rts(int tx);
+
+private:
+	HANDLE hnd_;
+	int state_;
+};
+#endif
+
+#ifdef __unix__
 class ptt_serial_unix: public ptt {
 public:
 	ptt_serial_unix() : fd_(-1) {}
@@ -54,5 +82,7 @@ private:
 	int fd_;
 	int state_;
 };
+#endif
+
 } /* namespace extmodem */
 #endif /* PTT_H_ */
