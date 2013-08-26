@@ -198,12 +198,14 @@ void kiss_session::handle_incoming_data(const unsigned char* buffer, std::size_t
 				last_good_pos = i;
 				i++;
 				frame_ptr new_frame(new frame());
-				kiss_decode(inbuff_.data() + start, end - start + 1, &(new_frame->get_data()));
+				int ret = kiss_decode(inbuff_.data() + start, end - start + 1, &(new_frame->get_data()));
 
-				std::cout << "NEW FRAME FROM TCP " << start << ", " << end << std::endl;
-				new_frame->print();
+				if (ret && (new_frame->get_data().size() > 0)) {
+					std::cout << "NEW FRAME FROM TCP " << start << ", " << end << std::endl;
+					new_frame->print();
 
-				get_kiss_server()->get_modem()->output_packet_to_sc(new_frame);
+					get_kiss_server()->get_modem()->output_packet_to_sc(new_frame);
+				}
 			}
 		}
 	}

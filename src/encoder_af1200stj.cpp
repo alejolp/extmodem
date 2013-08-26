@@ -36,6 +36,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <cstdio>
 
 #include "hdlc.h"
 #include "audiosource.h"
@@ -184,8 +185,20 @@ void encoder_af1200stj::send(frame_ptr fp) {
 	// CRC
 	int crc = calc_crc_ccitt(buffer.data(), buffer.size());
 
-	byteToSymbols((crc & 0xFF), true);
-	byteToSymbols(((crc >> 8) & 0xFF), true);
+	byteToSymbols((crc & 0xFF) ^ 0xFF, true);
+	byteToSymbols(((crc >> 8) & 0xFF) ^ 0xFF, true);
+
+#if 0
+	std::vector<unsigned char> qqq(buffer);
+	qqq.push_back((crc & 0xFF)^0xff);
+	qqq.push_back(((crc >> 8) & 0xFF)^0xff);
+	std::cout << "QQQ bufsize " << buffer.size() << " - crcqqq " << calc_crc_ccitt(qqq.data(), qqq.size()) << " - crc " << crc << " - crcok " << 0xF0B8 << std::endl;
+
+	for (k = 0; k < qqq.size(); ++k) {
+		std::printf("%02x ", qqq[k]);
+	}
+	std::printf("\n");
+#endif
 
 	// Tail
 	for (k = 0; k < tx_tail; ++k)
