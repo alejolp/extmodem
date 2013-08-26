@@ -48,6 +48,7 @@ bool config::is_help() {
 void config::init(int argc, char** argv) {
 	desc.add_options()
 	    ("help,h", "produce help message")
+	    ("debug,d", "produce debug messages")
 	    ("config-file", po::value<std::string>(), "configuration file name")
 	    ("kiss-tcp-port", po::value<int>(&kiss_tcp_port_)->default_value(6666), "set KISS TCP listening port")
 	    ("ptt-port", po::value<std::string>(&ptt_port_)->default_value("/dev/ttyS0"), "set serial port PTT name")
@@ -69,6 +70,8 @@ void config::init(int argc, char** argv) {
 			throw std::exception(); // FIXME
 		}
 	}
+
+	debug_ = (vm.count("debug") > 0);
 }
 
 

@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
 	em->set_encoder(encoder_ptr(new encoder_af1200stj()));
 
-	std::cerr << "Started" << std::endl;
+	std::cerr << "Started!" << std::endl;
 
 	em->start_and_run();
 

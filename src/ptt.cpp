@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <exception>
 
 #ifdef __unix__
 #include <sys/types.h>
@@ -50,6 +51,7 @@ static void unix_print_error(int err) {
 	char buf[1024];
 	strerror_r(err, buf, sizeof(buf));
 	std::cerr << "Error: open() " << buf << std::endl;
+	throw std::exception();
 }
 
 ptt_serial_unix::~ptt_serial_unix() {

@@ -169,7 +169,9 @@ void basic_asio_server::write_to_all(const unsigned char* buffer, std::size_t le
 /* KISS */
 
 void kiss_session::handle_incoming_data(const unsigned char* buffer, std::size_t length) {
-	std::cout << "data: " << length << std::endl;
+	if (config::Instance()->debug())
+		std::cout << "data: " << length << std::endl;
+
 	inbuff_.insert(inbuff_.end(), buffer, buffer + length);
 
 	unsigned int i = 0, start, end, last_good_pos = -1;
@@ -202,7 +204,11 @@ void kiss_session::handle_incoming_data(const unsigned char* buffer, std::size_t
 				int ret = kiss_decode(inbuff_.data() + start, end - start + 1, &(new_frame->get_data()));
 
 				if (ret && (new_frame->get_data().size() > 0)) {
-					std::cout << "NEW FRAME FROM TCP " << start << ", " << end << std::endl;
+					if (config::Instance()->debug())
+						std::cout << "NEW FRAME FROM TCP " << start << ", " << end << std::endl;
+					else
+						std::cout << "New local frame" << std::endl;
+
 					new_frame->print();
 
 					get_kiss_server()->get_modem()->output_packet_to_sc(new_frame);
@@ -216,11 +222,13 @@ void kiss_session::handle_incoming_data(const unsigned char* buffer, std::size_t
 }
 
 void kiss_session::handle_close() {
-	//std::cout << "close" << std::endl;
+	if (config::Instance()->debug())
+		std::cout << "TCP close" << std::endl;
 }
 
 void kiss_session::handle_connect() {
-	//std::cout << "connect, hay clientes: " << get_server()->get_clients().size() << std::endl;
+	if (config::Instance()->debug())
+		std::cout << "connect, hay clientes: " << get_server()->get_clients().size() << std::endl;
 }
 
 kiss_server* kiss_session::get_kiss_server() {
@@ -248,6 +256,7 @@ void tcpserver::run() {
 		io_service_.run();
 	} catch (std::exception& e) {
 		std::cerr << "Exception: " << e.what() << "\n";
+		throw;
 	}
 }
 
