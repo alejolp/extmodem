@@ -6,22 +6,26 @@
 
 import os, sys, multiprocessing
 
-FILES=['./src/decoder_af1200mm.cpp',
-    './src/extmodem.cpp',
-    './src/decoder_dtmf.cpp',
-    './src/multimon_utils.cpp',
-    './src/tcpserver.cpp',
-    './src/decoder_af1200stj.cpp',
-    './src/kiss.cpp',
-    './src/main.cpp',
-    './src/hdlc.cpp',
-    './src/decoder.cpp',
-    './src/audiosource.cpp',
-    './src/frame.cpp',
-    './src/encoder.cpp',
-    './src/encoder_af1200stj.cpp',
-    './src/ptt.cpp',
-    './src/extconfig.cpp']
+FILES=['src/audiosource.cpp',
+    'src/decoder_af1200mm.cpp',
+    'src/decoder_af1200stj.cpp',
+    'src/decoder.cpp',
+    'src/decoder_dtmf.cpp',
+    'src/encoder_af1200stj.cpp',
+    'src/encoder.cpp',
+    'src/extconfig.cpp',
+    'src/extmodem.cpp',
+    'src/frame.cpp',
+    'src/hdlc.cpp',
+    'src/kiss.cpp',
+    'src/main.cpp',
+    'src/multimon_utils.cpp',
+    'src/ptt.cpp',
+    'src/tcpserver_agwpe.cpp',
+    'src/tcpserver_base.cpp',
+    'src/tcpserver.cpp',
+    'src/tcpserver_kiss.cpp']
+
 OBJ_DIR = 'bin'
 CC = 'g++'
 CFLAGS = '-O3 -Wall'
