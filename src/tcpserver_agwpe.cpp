@@ -52,7 +52,7 @@ struct agwpe_tcp_frame {
 	uint8_t dataKind;
 
 	/* pid:
-	Frame PID, it’s usage is valid only under certain 
+	Frame PID, itâ€™s usage is valid only under certain 
 	frames only. Should be 0x00 when not used.
 	*/
 	uint8_t pid;
@@ -60,9 +60,9 @@ struct agwpe_tcp_frame {
 	/* callFrom:
 	CallSign FROM of the packet, in ASCII, using the 
 	format {CALLSIGN}-{SSID} (i.e. LU7DID-8)
-	it is “null terminated” (it ends with 0x00). ([5])
+	it is â€œnull terminatedâ€ (it ends with 0x00). ([5])
 	The field ALWAYS is 10 bytes long.
-	It’s filled on packets where it has some meaning.
+	Itâ€™s filled on packets where it has some meaning.
 	*/
 	char callFrom[11];
 
@@ -122,7 +122,7 @@ int agwpe_decode_frame(const unsigned char* data, std::size_t len, agwpe_tcp_fra
 	//frame->userReserved = *(reinterpret_cast<const uint32_t*>(&data[26]));
 
 	switch (frame->dataKind) {
-	case 'P': /* Application Login (‘P’ frame) */
+	case 'P': /* Application Login (â€˜Pâ€™ frame) */
 		if (frame->dataLen != 512)
 			return -1;
 		if ((len < AGWPE_MIN_HEADER_SIZE + 512))
@@ -133,58 +133,58 @@ int agwpe_decode_frame(const unsigned char* data, std::size_t len, agwpe_tcp_fra
 		p += 255;
 		return (p - data);
 
-	case 'X': /* Register CallSign (‘X’ frame) */
+	case 'X': /* Register CallSign (â€˜Xâ€™ frame) */
 		return -1;
 
-	case 'x': /* Unregister CallSign (‘x’ frame) */
+	case 'x': /* Unregister CallSign (â€˜xâ€™ frame) */
 		return -1;
 
-	case 'G': /* Ask Port Information (‘G’ frame) */
+	case 'G': /* Ask Port Information (â€˜Gâ€™ frame) */
 		return -1;
 
-	case 'm': /* Enable Reception of Monitoring Frames (‘m’ frame) */
+	case 'm': /* Enable Reception of Monitoring Frames (â€˜mâ€™ frame) */
 		return -1;
 
-	case 'R': /* AGWPE Version Info (‘R’ frame) */
+	case 'R': /* AGWPE Version Info (â€˜Râ€™ frame) */
 		return -1;
 
-	case 'g': /* Ask Port Capabilities (‘g’ frame) */
+	case 'g': /* Ask Port Capabilities (â€˜gâ€™ frame) */
 		return -1;
 
-	case 'H': /* Callsign Heard on a Port (‘H’ frame) */
+	case 'H': /* Callsign Heard on a Port (â€˜Hâ€™ frame) */
 		return -1;
 
-	case 'y': /* Ask Outstanding frames waiting on a Port (‘y’ Frame) */
+	case 'y': /* Ask Outstanding frames waiting on a Port (â€˜yâ€™ Frame) */
 		return -1;
 
-	case 'Y': /* Ask Outstanding frames waiting for a connection (‘Y’ frame) */
+	case 'Y': /* Ask Outstanding frames waiting for a connection (â€˜Yâ€™ frame) */
 		return -1;
 
-	case 'M': /* Send UNPROTO Information (‘M’ frame) */
+	case 'M': /* Send UNPROTO Information (â€˜Mâ€™ frame) */
 		return -1;
 
-	case 'C': /* Connect, Start an AX.25 Connection (‘C’ frame) */
+	case 'C': /* Connect, Start an AX.25 Connection (â€˜Câ€™ frame) */
 		return -1;
 
-	case 'D': /* Send Connected Data (‘D’ frame) */
+	case 'D': /* Send Connected Data (â€˜Dâ€™ frame) */
 		return -1;
 
-	case 'd': /* Disconnect, Terminate an AX.25 Connection (‘d’ frame) */
+	case 'd': /* Disconnect, Terminate an AX.25 Connection (â€˜dâ€™ frame) */
 		return -1;
 
-	case 'v': /* Connect VIA, Start an AX.25 circuit thru digipeaters (‘v’ frame) */
+	case 'v': /* Connect VIA, Start an AX.25 circuit thru digipeaters (â€˜vâ€™ frame) */
 		return -1;
 
-	case 'V': /* Send UNPROTO VIA (‘V’ frame) */
+	case 'V': /* Send UNPROTO VIA (â€˜Vâ€™ frame) */
 		return -1;
 
-	case 'c': /* Non-Standard Connections, Connection with PID (‘c’ frame) */
+	case 'c': /* Non-Standard Connections, Connection with PID (â€˜câ€™ frame) */
 		return -1;
 
-	case 'K': /* Send Data in “raw” AX.25 format (‘K’ frame) */
+	case 'K': /* Send Data in â€œrawâ€ AX.25 format (â€˜Kâ€™ frame) */
 		return -1;
 
-	case 'k': /* Activate reception of Frames in “raw” format (‘k’ Frame) */
+	case 'k': /* Activate reception of Frames in â€œrawâ€ format (â€˜kâ€™ Frame) */
 		return -1;
 
 	default:
