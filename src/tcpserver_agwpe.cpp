@@ -25,6 +25,8 @@
 #include <boost/static_assert.hpp>
 
 #include "tcpserver_agwpe.h"
+#include "frame.h"
+#include "extmodem.h"
 #include "extconfig.h"
 
 #ifdef _MSC_VER
@@ -399,8 +401,8 @@ void agwpe_session::handle_incoming_data(const unsigned char* buffer, std::size_
 	inbuff_.erase(inbuff_.begin(), inbuff_.begin() + (p - inbuff_.data()));
 }
 
-void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_frame) {
-	switch (new_frame->header.dataKind) {
+void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_agwpe_frame) {
+	switch (new_agwpe_frame->header.dataKind) {
 
 	case 'R': /* AGWPE Version Info (‘R’ frame) */
 	{
@@ -427,6 +429,19 @@ void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_frame) {
 	}
 	break;
 
+	case 'K': /* Send Data in “raw” AX.25 format (‘K’ frame) */
+	{
+		frame_ptr new_ax25_frame (
+			new frame(reinterpret_cast<const unsigned char*>(new_agwpe_frame->data.raw_data + 1),
+					new_agwpe_frame->header.dataLen - 1));
+
+		std::cout << "AGWPE New local frame" << std::endl;
+		new_ax25_frame->print();
+
+		get_agwpe_server()->get_modem()->output_packet_to_sc(new_ax25_frame);
+	}
+	break;
+
 #if 0
 	case 'P': /* Application Login (‘P’ frame) */
 		break;
@@ -437,12 +452,10 @@ void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_frame) {
 	case 'm': /* Enable Reception of Monitoring Frames (‘m’ frame) */
 		break;
 
-	case 'K': /* Send Data in “raw” AX.25 format (‘K’ frame) */
-		break;
 #endif
 
 	default:
-		std::cerr << "AGWPE UNHANDLED PACKET type: " << new_frame->header.dataKind << std::endl;
+		std::cerr << "AGWPE UNHANDLED PACKET type: " << new_agwpe_frame->header.dataKind << std::endl;
 		break;
 	}
 }

@@ -23,7 +23,13 @@
 
 namespace extmodem {
 
-frame::frame(const unsigned char* buffer, std::size_t length, unsigned int crc) : data_(buffer, buffer + length), crc_(crc) {
+frame::frame(const unsigned char* buffer, std::size_t length)
+ : data_(buffer, buffer + length), crc_(calc_crc_ccitt(buffer, length)) {
+
+}
+
+frame::frame(const unsigned char* buffer, std::size_t length, unsigned int crc)
+ : data_(buffer, buffer + length), crc_(crc) {
 
 }
 

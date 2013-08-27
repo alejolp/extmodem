@@ -33,14 +33,26 @@ typedef boost::shared_ptr<frame> frame_ptr;
 
 class frame {
 public:
+	/** Construct a new empty frame.
+	 *
+	 */
+	explicit frame() : crc_(0) {};
+
+	/**  Constructs a new frame without the CRC at the end of the buffer.
+	 *
+	 * @param buffer
+	 * @param length
+	 */
+	explicit frame(const unsigned char* buffer, std::size_t length);
+
 	/**  Constructs a new frame without the CRC at the end of the buffer.
 	 *
 	 * @param buffer
 	 * @param length
 	 * @param crc
 	 */
-	explicit frame() : crc_(0) {};
 	explicit frame(const unsigned char* buffer, std::size_t length, unsigned int crc);
+
 	virtual ~frame();
 
 	std::vector<unsigned char>& get_data() { return data_; }
