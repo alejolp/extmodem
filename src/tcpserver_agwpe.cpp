@@ -279,8 +279,6 @@ int agwpe_decode_frame(const unsigned char* data, std::size_t len, agwpe_tcp_fra
 }
 
 int agwpe_encode_frame(agwpe_tcp_frame* frame, std::vector<unsigned char>* out) {
-	const unsigned char* p = reinterpret_cast<const unsigned char*>(&(frame->header));
-
 	/* fill DataLen field */
 
 	switch (frame->header.dataKind) {
@@ -344,14 +342,25 @@ int agwpe_encode_frame(agwpe_tcp_frame* frame, std::vector<unsigned char>* out) 
 		return -1;
 	}
 
-	out->insert(out->end(), p, p + sizeof(frame->header));
-	p += sizeof(frame->header);
+	const unsigned char* p;
 
+	p = reinterpret_cast<const unsigned char*>(&(frame->header));
+	out->insert(out->end(), p, p + sizeof(frame->header));
+
+	p = reinterpret_cast<const unsigned char*>(&(frame->data));
 	out->insert(out->end(), p, p + frame->header.dataLen);
-	p += frame->header.dataLen;
 
 	return sizeof(frame->header) + frame->header.dataLen;
 }
+
+int agwpe_decode_frame(const unsigned char* data, std::size_t len, agwpe_tcp_frame_ptr frame) {
+	return agwpe_decode_frame(data, len, frame.get());
+}
+
+int agwpe_encode_frame(agwpe_tcp_frame_ptr frame, std::vector<unsigned char>* out) {
+	return agwpe_encode_frame(frame.get(), out);
+}
+
 
 void agwpe_session::handle_connect() {
 	if (config::Instance()->debug())
@@ -373,7 +382,7 @@ void agwpe_session::handle_incoming_data(const unsigned char* buffer, std::size_
 
 	for (;;) {
 		agwpe_tcp_frame_ptr new_frame(new agwpe_tcp_frame());
-		ret = agwpe_decode_frame(p, length - (p - inbuff_.data()), new_frame.get());
+		ret = agwpe_decode_frame(p, length - (p - inbuff_.data()), new_frame);
 		if (ret <= -1) {
 			close();
 			return;
@@ -391,6 +400,31 @@ void agwpe_session::handle_incoming_data(const unsigned char* buffer, std::size_
 void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_frame) {
 	switch (new_frame->header.dataKind) {
 
+	case 'R': /* AGWPE Version Info (‘R’ frame) */
+	{
+		agwpe_tcp_frame_ptr reply_frame(new agwpe_tcp_frame());
+		std::vector<unsigned char> reply_out_bytes;
+		std::memset(reply_frame.get(), 0, sizeof(agwpe_tcp_frame));
+		reply_frame->header.dataKind = 'R';
+		reply_frame->data.out_R_frame.major = 2;
+		reply_frame->data.out_R_frame.minor = 99;
+		agwpe_encode_frame(reply_frame, &reply_out_bytes);
+		write(reply_out_bytes.data(), reply_out_bytes.size());
+	}
+	break;
+
+	case 'G': /* Ask Port Information (‘G’ frame) */
+	{
+		agwpe_tcp_frame_ptr reply_frame(new agwpe_tcp_frame());
+		std::vector<unsigned char> reply_out_bytes;
+		std::memset(reply_frame.get(), 0, sizeof(agwpe_tcp_frame));
+		reply_frame->header.dataKind = 'G';
+		std::strcpy(reply_frame->data.out_G_frame.data, "1; Port 1 EXTMODEM;");
+		agwpe_encode_frame(reply_frame, &reply_out_bytes);
+		write(reply_out_bytes.data(), reply_out_bytes.size());
+	}
+	break;
+
 #if 0
 	case 'P': /* Application Login (‘P’ frame) */
 		break;
@@ -398,13 +432,7 @@ void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_frame) {
 	case 'X': /* Register CallSign (‘X’ frame) */
 		break;
 
-	case 'G': /* Ask Port Information (‘G’ frame) */
-		break;
-
 	case 'm': /* Enable Reception of Monitoring Frames (‘m’ frame) */
-		break;
-
-	case 'R': /* AGWPE Version Info (‘R’ frame) */
 		break;
 
 	case 'K': /* Send Data in “raw” AX.25 format (‘K’ frame) */
