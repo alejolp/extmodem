@@ -121,7 +121,9 @@ EXTMODEM_VCPP_ALIGN(1) struct agwpe_tcp_frame {
 
 		struct {
 			uint16_t major;
+			uint16_t unsed1;
 			uint16_t minor;
+			uint16_t unsed2;
 		} out_R_frame;
 		struct {
 			uint8_t status;
@@ -406,7 +408,7 @@ void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_frame) {
 		std::vector<unsigned char> reply_out_bytes;
 		std::memset(reply_frame.get(), 0, sizeof(agwpe_tcp_frame));
 		reply_frame->header.dataKind = 'R';
-		reply_frame->data.out_R_frame.major = 2;
+		reply_frame->data.out_R_frame.major = 2000;
 		reply_frame->data.out_R_frame.minor = 99;
 		agwpe_encode_frame(reply_frame, &reply_out_bytes);
 		write(reply_out_bytes.data(), reply_out_bytes.size());
