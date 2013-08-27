@@ -28,6 +28,8 @@ namespace extmodem {
 class agwpe_server;
 class modem;
 
+class agwpe_tcp_frame;
+
 class agwpe_session : public basic_asio_session {
 public:
 	agwpe_session(boost::asio::io_service& io_service, basic_asio_server* server) : basic_asio_session(io_service, server) {}
@@ -41,6 +43,9 @@ protected:
 	agwpe_server* get_agwpe_server();
 
 private:
+	typedef boost::shared_ptr<agwpe_tcp_frame> agwpe_tcp_frame_ptr;
+
+	void handle_agwpe_frame(agwpe_tcp_frame_ptr new_frame);
 	std::vector<unsigned char> inbuff_;
 
 };

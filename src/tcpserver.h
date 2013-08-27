@@ -34,6 +34,7 @@
 namespace extmodem {
 
 class kiss_server;
+class agwpe_server;
 class modem;
 
 class tcpserver {
@@ -54,6 +55,7 @@ private:
 	boost::asio::io_service io_service_;
 
 	boost::shared_ptr<kiss_server> kiss_srv_;
+	boost::shared_ptr<agwpe_server> agwpe_srv_;
 	boost::mutex output_queue_mutex_;
 	std::deque<frame_ptr> output_queue_;
 };

@@ -44,6 +44,7 @@ public:
 	basic_asio_server* get_server() { return server_; }
 
 	void start();
+	void close();
 	void write(const unsigned char* buffer, std::size_t length);
 
 protected:

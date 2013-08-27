@@ -27,6 +27,7 @@
 #include "extconfig.h"
 
 #include "tcpserver_kiss.h"
+#include "tcpserver_agwpe.h"
 
 
 namespace extmodem {
@@ -35,7 +36,9 @@ namespace extmodem {
 /**********************************************/
 /* tcpserver */
 
-tcpserver::tcpserver(modem* em) : kiss_srv_(new kiss_server(io_service_, config::Instance()->kiss_tcp_port(), em)) {
+tcpserver::tcpserver(modem* em)
+	: kiss_srv_(new kiss_server(io_service_, config::Instance()->kiss_tcp_port(), em)),
+	  agwpe_srv_(new agwpe_server(io_service_, config::Instance()->agwpe_tcp_port(), em)){
 	
 }
 

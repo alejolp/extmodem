@@ -47,6 +47,7 @@ public:
 	po::variables_map& get_vm() { return vm; }
 
 	int kiss_tcp_port() const { return kiss_tcp_port_; }
+	int agwpe_tcp_port() const { return agwpe_tcp_port_; }
 	const std::string& ptt_port() const { return ptt_port_; }
 	int tx_delay() const { return tx_delay_; }
 	int tx_tail() const { return tx_tail_; }
@@ -58,6 +59,7 @@ private:
 	po::positional_options_description p_;
 
 	int kiss_tcp_port_;
+	int agwpe_tcp_port_;
 	std::string ptt_port_;
 	int tx_delay_;
 	int tx_tail_;

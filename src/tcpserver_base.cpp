@@ -34,6 +34,10 @@ void basic_asio_session::start() {
 	handle_connect();
 }
 
+void basic_asio_session::close() {
+	socket_.close();
+}
+
 void basic_asio_session::write(const unsigned char* buffer, std::size_t length) {
 	out_data_queue_.push_back(std::vector<unsigned char>(buffer, buffer + length));
 	start_write();
