@@ -49,6 +49,7 @@ tcpserver::~tcpserver() {
 void tcpserver::run() {
 	try {
 		kiss_srv_->start();
+		agwpe_srv_->start();
 		io_service_.run();
 	} catch (std::exception& e) {
 		std::cerr << "Exception: " << e.what() << "\n";
