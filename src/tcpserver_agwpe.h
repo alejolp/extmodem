@@ -25,7 +25,39 @@
 
 namespace extmodem {
 
+class agwpe_server;
+class modem;
 
+class agwpe_session : public basic_asio_session {
+public:
+	agwpe_session(boost::asio::io_service& io_service, basic_asio_server* server) : basic_asio_session(io_service, server) {}
+	virtual ~agwpe_session() {}
+
+protected:
+	virtual void handle_connect();
+	virtual void handle_close();
+	virtual void handle_incoming_data(const unsigned char* buffer, std::size_t length);
+
+	agwpe_server* get_agwpe_server();
+
+private:
+	std::vector<unsigned char> inbuff_;
+
+};
+
+class agwpe_server : public basic_asio_server {
+public:
+	explicit agwpe_server(boost::asio::io_service& io_service, unsigned short port, modem* em) : basic_asio_server(io_service, port), em_(em) {}
+	virtual ~agwpe_server() {}
+
+	modem* get_modem() { return em_; }
+
+protected:
+	virtual basic_asio_session* new_session_instance(boost::asio::io_service& io_service_);
+
+private:
+	modem* em_;
+};
 
 }
 

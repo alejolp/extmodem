@@ -109,7 +109,7 @@ void basic_asio_session::handle_write(const boost::system::error_code& error) {
 	}
 }
 
-basic_asio_server::basic_asio_server(boost::asio::io_service& io_service, short port) :
+basic_asio_server::basic_asio_server(boost::asio::io_service& io_service, unsigned short port) :
 		io_service_(io_service), acceptor_(io_service,
 				boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
 { }

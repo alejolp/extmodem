@@ -46,7 +46,7 @@ private:
 
 class kiss_server : public basic_asio_server {
 public:
-	explicit kiss_server(boost::asio::io_service& io_service, short port, modem* em) : basic_asio_server(io_service, port), em_(em) {}
+	explicit kiss_server(boost::asio::io_service& io_service, unsigned short port, modem* em) : basic_asio_server(io_service, port), em_(em) {}
 	virtual ~kiss_server() {}
 
 	modem* get_modem() { return em_; }

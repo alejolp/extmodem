@@ -74,7 +74,7 @@ private:
 
 class basic_asio_server {
 public:
-	explicit basic_asio_server(boost::asio::io_service& io_service, short port);
+	explicit basic_asio_server(boost::asio::io_service& io_service, unsigned short port);
 	virtual ~basic_asio_server();
 
 	void start();
