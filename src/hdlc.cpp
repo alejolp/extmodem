@@ -127,12 +127,12 @@ void hdlc::ax25_dispatch_packet(unsigned char *bp, unsigned int len) {
 	if (!check_crc_ccitt(bp, len))
 		return;
 
-	ax25_print_packet(bp, len, name_.c_str(), 1);
+	ax25_print_packet(bp, len, name_.c_str(), 0);
 
 	unsigned int crc = *((unsigned short*)(&bp[len - 2]));
 
 	// The "bp" buffer contains the CRC at the end!
-	frame_ptr new_frame(new frame(bp, len - 2, crc));
+	frame_ptr new_frame(new frame(bp, len - 2));
 
 	em_->dispatch_packet(new_frame);
 }
