@@ -33,8 +33,10 @@ typedef boost::shared_ptr<agwpe_tcp_frame> agwpe_tcp_frame_ptr;
 
 class agwpe_session : public basic_asio_session {
 public:
-	agwpe_session(boost::asio::io_service& io_service, basic_asio_server* server) : basic_asio_session(io_service, server) {}
+	agwpe_session(boost::asio::io_service& io_service, basic_asio_server* server);
 	virtual ~agwpe_session() {}
+
+	virtual void write(frame_ptr fp);
 
 protected:
 	virtual void handle_connect();
@@ -46,7 +48,7 @@ protected:
 private:
 	void handle_agwpe_frame(agwpe_tcp_frame_ptr new_frame);
 	std::vector<unsigned char> inbuff_;
-
+	bool want_raw_frames_;
 };
 
 class agwpe_server : public basic_asio_server {

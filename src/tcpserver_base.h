@@ -28,6 +28,8 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 
+#include "frame.h"
+
 namespace extmodem {
 
 class basic_asio_server;
@@ -45,7 +47,9 @@ public:
 
 	void start();
 	void close();
-	void write(const unsigned char* buffer, std::size_t length);
+	void write_raw(const unsigned char* buffer, std::size_t length);
+
+	virtual void write(frame_ptr fp) = 0;
 
 protected:
 	virtual void handle_connect();
@@ -83,7 +87,8 @@ public:
 
 	std::set<basic_asio_session*>& get_clients() { return clients_; }
 
-	void write_to_all(const unsigned char* buffer, std::size_t length);
+	void write_to_all(frame_ptr fp);
+	//void write_to_all(const unsigned char* buffer, std::size_t length);
 
 protected:
 	virtual basic_asio_session* new_session_instance(boost::asio::io_service& io_service_) = 0;

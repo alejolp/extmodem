@@ -33,6 +33,8 @@ public:
 	explicit kiss_session(boost::asio::io_service& io_service, basic_asio_server* server) : basic_asio_session(io_service, server) {}
 	virtual ~kiss_session() {}
 
+	virtual void write(frame_ptr fp);
+
 protected:
 	virtual void handle_connect();
 	virtual void handle_close();

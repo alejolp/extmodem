@@ -58,16 +58,17 @@ void tcpserver::run() {
 }
 
 void tcpserver::flush_output_queue() {
+	/*
+	 * THREADING INFO: This function gets called from the main thread running io_service's run().
+	 */
 	boost::lock_guard<boost::mutex> guard_(output_queue_mutex_);
 
 	while (!output_queue_.empty()) {
 		frame_ptr fp = output_queue_.front();
-		std::vector<unsigned char> kiss_data;
-
 		output_queue_.pop_front();
 
-		kiss_encode(fp->get_data().data(), fp->get_data().size(), &kiss_data);
-		kiss_srv_->write_to_all(kiss_data.data(), kiss_data.size());
+		kiss_srv_->write_to_all(fp);
+		agwpe_srv_->write_to_all(fp);
 	}
 }
 
@@ -77,6 +78,7 @@ void tcpserver::write_to_all_safe(frame_ptr fp) {
 		output_queue_.push_back(fp);
 	}
 
+	// Executes the flush_output_queue method on the main thread.
 	io_service_.dispatch(boost::bind(&tcpserver::flush_output_queue, this));
 }
 

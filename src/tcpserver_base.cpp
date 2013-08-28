@@ -38,7 +38,7 @@ void basic_asio_session::close() {
 	socket_.close();
 }
 
-void basic_asio_session::write(const unsigned char* buffer, std::size_t length) {
+void basic_asio_session::write_raw(const unsigned char* buffer, std::size_t length) {
 	out_data_queue_.push_back(std::vector<unsigned char>(buffer, buffer + length));
 	start_write();
 }
@@ -155,6 +155,16 @@ void basic_asio_server::session_closed(basic_asio_session* s) {
 	clients_.erase(s);
 }
 
+void basic_asio_server::write_to_all(frame_ptr fp) {
+	//write_to_all(fp->get_data().data(), fp->get_data().size());
+	std::set<basic_asio_session*>::iterator it;
+
+	for (it = clients_.begin(); it != clients_.end(); ++it) {
+		(*it)->write(fp);
+	}
+}
+
+#if 0
 void basic_asio_server::write_to_all(const unsigned char* buffer, std::size_t length) {
 	std::set<basic_asio_session*>::iterator it;
 
@@ -162,6 +172,7 @@ void basic_asio_server::write_to_all(const unsigned char* buffer, std::size_t le
 		(*it)->write(buffer, length);
 	}
 }
+#endif
 
 }
 

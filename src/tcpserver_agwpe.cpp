@@ -365,6 +365,11 @@ int agwpe_encode_frame(agwpe_tcp_frame_ptr frame, std::vector<unsigned char>* ou
 	return agwpe_encode_frame(frame.get(), out);
 }
 
+agwpe_session::agwpe_session(boost::asio::io_service& io_service, basic_asio_server* server)
+ : basic_asio_session(io_service, server), want_raw_frames_(false)
+{
+
+}
 
 void agwpe_session::handle_connect() {
 	if (config::Instance()->debug())
@@ -402,8 +407,11 @@ void agwpe_session::handle_incoming_data(const unsigned char* buffer, std::size_
 }
 
 void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_agwpe_frame) {
-	switch (new_agwpe_frame->header.dataKind) {
+	if (config::Instance()->debug())
+			std::cout << "AGWPE new frame kind: " << new_agwpe_frame->header.dataKind << std::endl;
 
+	switch (new_agwpe_frame->header.dataKind)
+	{
 	case 'R': /* AGWPE Version Info (‘R’ frame) */
 	{
 		agwpe_tcp_frame_ptr reply_frame(new agwpe_tcp_frame());
@@ -413,7 +421,7 @@ void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_agwpe_frame) {
 		reply_frame->data.out_R_frame.major = 2000;
 		reply_frame->data.out_R_frame.minor = 99;
 		agwpe_encode_frame(reply_frame, &reply_out_bytes);
-		write(reply_out_bytes.data(), reply_out_bytes.size());
+		write_raw(reply_out_bytes.data(), reply_out_bytes.size());
 	}
 	break;
 
@@ -425,7 +433,7 @@ void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_agwpe_frame) {
 		reply_frame->header.dataKind = 'G';
 		std::strcpy(reply_frame->data.out_G_frame.data, "1; Port 1 EXTMODEM;");
 		agwpe_encode_frame(reply_frame, &reply_out_bytes);
-		write(reply_out_bytes.data(), reply_out_bytes.size());
+		write_raw(reply_out_bytes.data(), reply_out_bytes.size());
 	}
 	break;
 
@@ -439,6 +447,12 @@ void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_agwpe_frame) {
 		new_ax25_frame->print();
 
 		get_agwpe_server()->get_modem()->output_packet_to_sc(new_ax25_frame);
+	}
+	break;
+
+	case 'k': /* Activate reception of Frames in “raw” format (‘k’ Frame) */
+	{
+		want_raw_frames_ = !want_raw_frames_;
 	}
 	break;
 
@@ -462,6 +476,12 @@ void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_agwpe_frame) {
 
 agwpe_server* agwpe_session::get_agwpe_server() {
 	return reinterpret_cast<agwpe_server*>(get_server());
+}
+
+void agwpe_session::write(frame_ptr fp) {
+	if (want_raw_frames_) {
+
+	}
 }
 
 basic_asio_session* agwpe_server::new_session_instance(boost::asio::io_service& io_service_) {

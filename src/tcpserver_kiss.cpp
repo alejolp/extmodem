@@ -84,6 +84,12 @@ void kiss_session::handle_incoming_data(const unsigned char* buffer, std::size_t
 
 }
 
+void kiss_session::write(frame_ptr fp) {
+	std::vector<unsigned char> kiss_data;
+	kiss_encode(fp->get_data().data(), fp->get_data().size(), &kiss_data);
+	write_raw(kiss_data.data(), kiss_data.size());
+}
+
 void kiss_session::handle_close() {
 	if (config::Instance()->debug())
 		std::cout << "TCP close" << std::endl;
