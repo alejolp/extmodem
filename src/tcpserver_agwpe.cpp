@@ -480,7 +480,14 @@ agwpe_server* agwpe_session::get_agwpe_server() {
 
 void agwpe_session::write(frame_ptr fp) {
 	if (want_raw_frames_) {
-
+		agwpe_tcp_frame_ptr reply_frame(new agwpe_tcp_frame());
+		std::vector<unsigned char> reply_out_bytes;
+		std::memset(reply_frame.get(), 0, sizeof(agwpe_tcp_frame));
+		reply_frame->header.dataKind = 'K';
+		reply_frame->header.dataLen = fp->get_data().size() + 1;
+		std::memcpy(reply_frame->data.raw_data + 1, fp->get_data().data(), fp->get_data().size());
+		agwpe_encode_frame(reply_frame, &reply_out_bytes);
+		write_raw(reply_out_bytes.data(), reply_out_bytes.size());
 	}
 }
 
