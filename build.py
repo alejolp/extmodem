@@ -60,7 +60,7 @@ def main():
 
     pool.map(proc_func, queue)
 
-    cmd = CC + " " + LDFLAGS + " -o \"" + os.path.join(OBJ_DIR, EXECUTABLE) + "\" " + ' '.join(objs)
+    cmd = CC + " -o \"" + os.path.join(OBJ_DIR, EXECUTABLE) + "\" " + ' '.join(objs) + " " + LDFLAGS
     print(cmd)
     os.system(cmd)
 
