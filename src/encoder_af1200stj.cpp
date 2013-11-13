@@ -117,7 +117,7 @@ void encoder_af1200stj::init(audiosource* a) {
 	phase_inc_f1 = (float) (2.0*M_PI*2200.0/sample_rate_);
 	phase_inc_symbol = (float) (2.0*M_PI*1200.0/sample_rate_);
 
-	ptt_ = ptt::factory();
+	ptt_ = ptt::factory(config::Instance()->ptt_mode());
 	ptt_->init(config::Instance()->ptt_port().c_str());
 }
 

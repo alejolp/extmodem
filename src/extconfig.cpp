@@ -52,7 +52,8 @@ void config::init(int argc, char** argv) {
 	    ("config-file", po::value<std::string>(), "configuration file name")
 	    ("kiss-tcp-port", po::value<int>(&kiss_tcp_port_)->default_value(6666), "set KISS TCP listening port")
 	    ("agwpe-tcp-port", po::value<int>(&agwpe_tcp_port_)->default_value(8000), "set AGWPE emulator TCP listening port")
-	    ("ptt-port", po::value<std::string>(&ptt_port_)->default_value("/dev/ttyS0"), "set serial port PTT name")
+	    ("ptt-mode", po::value<std::string>(&ptt_mode_)->default_value("serial"), "PTT mode: serial,parallel")
+	    ("ptt-port", po::value<std::string>(&ptt_port_)->default_value("/dev/ttyS0"), "set serial/parallel port PTT file name")
 	    ("tx-delay", po::value<int>(&tx_delay_)->default_value(200), "set tx-delay in ms")
 	    ("tx-tail", po::value<int>(&tx_tail_)->default_value(50), "set tx-tail in ms")
 	;
