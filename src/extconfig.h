@@ -46,6 +46,7 @@ public:
 	bool is_help();
 	po::variables_map& get_vm() { return vm; }
 
+	const std::string audio_backend() const { return audio_backend_; }
 	int kiss_tcp_port() const { return kiss_tcp_port_; }
 	int agwpe_tcp_port() const { return agwpe_tcp_port_; }
 	const std::string& ptt_port() const { return ptt_port_; }
@@ -59,6 +60,7 @@ private:
 	po::variables_map vm;
 	po::positional_options_description p_;
 
+	std::string audio_backend_;
 	int kiss_tcp_port_;
 	int agwpe_tcp_port_;
 	std::string ptt_port_;

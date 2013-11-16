@@ -51,10 +51,13 @@ int main(int argc, char **argv) {
 	boost::shared_ptr<modem> em(new modem());
 	boost::shared_ptr<audiosource> as;
 
-	if (1) {
+	if (cfg->audio_backend() == "portaudio") {
 		as.reset(new audiosource_portaudio(SAMPLE_RATE));
-	} else {
+	} else if (cfg->audio_backend() == "alsa") {
 		as.reset(new audiosource_alsa(SAMPLE_RATE));
+	} else {
+		std::cerr << "ERROR: Invalid audio backend" << std::endl;
+		return 1;
 	}
 
 	std::cerr << "Starting extmodem ... " << std::endl;

@@ -31,7 +31,7 @@ FILES=['src/audiosource.cpp',
 
 OBJ_DIR = 'bin'
 CC = 'g++'
-CFLAGS = '-O3 -Wall'
+CFLAGS = '-g -O3 -Wall'
 LDFLAGS = '-lportaudio -lboost_system -lboost_program_options'
 EXECUTABLE = 'extmodem'
 JOBS_COUNT = multiprocessing.cpu_count()
@@ -42,7 +42,7 @@ JOBS_COUNT = multiprocessing.cpu_count()
 
 def proc_func(p):
     out_bin_path, f = p
-    cmd = CC + " " + CFLAGS + " -c -o \"" + out_bin_path + "\" \"" + f + "\""
+    cmd = CC + " " + CFLAGS + " -o \"" + out_bin_path + "\" -c \"" + f + "\""
     print(cmd)
     os.system(cmd)
 

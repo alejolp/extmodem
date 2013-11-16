@@ -39,7 +39,7 @@ void audiosource_alsa::init() {
 			SND_PCM_ACCESS_RW_INTERLEAVED,
 			get_out_channel_count(),
 			get_sample_rate(),
-			0, /* FIXME: resample? */
+			1, /* FIXME: resample? */
 			500000)) < 0) { /* 0.5sec */
 		std::cerr << "snd_pcm_set_params error: " << snd_strerror(err) << std::endl;
 		close();
@@ -57,7 +57,7 @@ void audiosource_alsa::init() {
 			SND_PCM_ACCESS_RW_INTERLEAVED,
 			get_in_channel_count(),
 			get_sample_rate(),
-			0, /* FIXME: resample? */
+			1, /* FIXME: resample? */
 			500000)) < 0) { /* 0.5sec */
 		std::cerr << "snd_pcm_set_params error: " << snd_strerror(err) << std::endl;
 		close();
