@@ -22,7 +22,6 @@
 #ifndef AUDIOSOURCE_H_
 #define AUDIOSOURCE_H_
 
-#include <portaudio.h>
 #include <exception>
 #include <string>
 
@@ -62,21 +61,6 @@ public:
 private:
 	int sample_rate_;
 	audiosourcelistener* listener_;
-};
-
-class audiosource_portaudio : public audiosource {
-public:
-	explicit audiosource_portaudio(int sample_rate);
-	virtual ~audiosource_portaudio();
-
-private:
-	void init();
-	void close();
-
-private:
-	PaStream *stream_in;
-	PaStream *stream_out;
-	PaError err;
 };
 
 } /* namespace extmodem */

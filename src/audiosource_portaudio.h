@@ -18,14 +18,31 @@
  *      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef AUDIOSOURCE_PORTAUDIO_H_
+#define AUDIOSOURCE_PORTAUDIO_H_
+
+#include <portaudio.h>
 #include "audiosource.h"
 
-/* FIXME */
 
 namespace extmodem {
 
-audiosource::audiosource(int sample_rate) : sample_rate_(sample_rate), listener_(0) {}
+class audiosource_portaudio : public audiosource {
+public:
+	explicit audiosource_portaudio(int sample_rate);
+	virtual ~audiosource_portaudio();
 
-audiosource::~audiosource() {}
+private:
+	void init();
+	void close();
+
+private:
+	PaStream *stream_in;
+	PaStream *stream_out;
+	PaError err;
+};
+
+
 
 } /* namespace extmodem */
+#endif /* AUDIOSOURCE_PORTAUDIO_H_ */

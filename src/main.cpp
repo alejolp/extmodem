@@ -19,7 +19,7 @@
  */
 
 
-#include "audiosource.h"
+#include "audiosource_portaudio.h"
 #include "extmodem.h"
 #include "extconfig.h"
 
