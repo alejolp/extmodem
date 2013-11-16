@@ -25,6 +25,9 @@
 #include <exception>
 #include <string>
 
+#include <boost/noncopyable.hpp>
+
+
 
 namespace extmodem {
 
@@ -46,10 +49,12 @@ public:
 	virtual void output_callback(audiosource* a, float* buffer, unsigned long length) = 0;
 };
 
-class audiosource {
+class audiosource: private boost::noncopyable {
 public:
 	explicit audiosource(int sample_rate);
 	virtual ~audiosource();
+
+	virtual void loop() = 0;
 
 	void set_listener(audiosourcelistener* p) { listener_ = p; }
 	audiosourcelistener* get_listener() const { return listener_; }

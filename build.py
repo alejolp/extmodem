@@ -8,6 +8,7 @@ import os, sys, multiprocessing
 
 FILES=['src/audiosource.cpp',
     'src/audiosource_portaudio.cpp',
+    'src/audiosource_alsa.cpp',
     'src/decoder_af1200mm.cpp',
     'src/decoder_af1200stj.cpp',
     'src/decoder.cpp',

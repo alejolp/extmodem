@@ -20,6 +20,7 @@
 
 
 #include "audiosource_portaudio.h"
+#include "audiosource_alsa.h"
 #include "extmodem.h"
 #include "extconfig.h"
 
@@ -48,7 +49,13 @@ int main(int argc, char **argv) {
 
 	int i;
 	boost::shared_ptr<modem> em(new modem());
-	boost::shared_ptr<audiosource> as(new audiosource_portaudio(SAMPLE_RATE));
+	boost::shared_ptr<audiosource> as;
+
+	if (1) {
+		as.reset(new audiosource_portaudio(SAMPLE_RATE));
+	} else {
+		as.reset(new audiosource_alsa(SAMPLE_RATE));
+	}
 
 	std::cerr << "Starting extmodem ... " << std::endl;
 
@@ -65,10 +72,7 @@ int main(int argc, char **argv) {
 	std::cerr << "Started!" << std::endl;
 
 	em->start_and_run();
-
-	for (;;) {
-		Pa_Sleep(1000);
-	}
+	as->loop();
 
 	return 0;
 }

@@ -31,7 +31,9 @@ audiosource_portaudio::audiosource_portaudio(int sample_rate) : audiosource(samp
 	init();
 }
 
-audiosource_portaudio::~audiosource_portaudio() {}
+audiosource_portaudio::~audiosource_portaudio() {
+	close();
+}
 
 namespace {
 
@@ -194,5 +196,12 @@ void audiosource_portaudio::close() {
 		throw audiosourceexception("Pa_Terminate");
 	}
 }
+
+void audiosource_portaudio::loop() {
+	for (;;) {
+		Pa_Sleep(1000);
+	}
+}
+
 
 } /* namespace extmodem */
