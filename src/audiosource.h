@@ -27,19 +27,10 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "extexception.h"
 
 
 namespace extmodem {
-
-class audiosourceexception : public std::exception {
-public:
-	explicit audiosourceexception(const std::string& msg) throw() : msg_(msg) {}
-	virtual ~audiosourceexception() throw() {}
-	virtual const char* what() const throw() { return msg_.c_str(); }
-
-private:
-	std::string msg_;
-};
 
 class audiosource;
 

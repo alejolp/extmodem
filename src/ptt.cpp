@@ -41,6 +41,7 @@
 
 #include "ptt.h"
 #include "ptt_serpar.h"
+#include "extexception.h"
 
 namespace extmodem {
 
@@ -53,7 +54,9 @@ ptt::~ptt() {
 }
 
 ptt_ptr ptt::factory(const std::string& mode) {
-	if (mode == "serial") {
+	if (mode == "null") {
+	return ptt_ptr(new ptt_dummy());
+	} else if (mode == "serial") {
 #ifdef __unix__
 	return ptt_ptr(new ptt_serial_unix());
 #endif
@@ -68,8 +71,23 @@ ptt_ptr ptt::factory(const std::string& mode) {
 	return ptt_ptr(new ptt_parallel_windows());
 #endif
 	}
-	return ptt_ptr();
+	throw extexception("ptt::factory unknown mode '" + mode + "'");
+	//return ptt_ptr();
 }
 
+ptt_dummy::~ptt_dummy() {}
+
+int ptt_dummy::init(const char* fname) {
+	state_ = 0;
+	return 1;
+}
+
+void ptt_dummy::set_tx(int tx) {
+	state_ = !!tx;
+}
+
+int ptt_dummy::get_tx() {
+	return state_;
+}
 
 } /* namespace extmodem */

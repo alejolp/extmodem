@@ -42,6 +42,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <exception>
+#include <sstream>
+
 
 #ifdef __unix__
 #include <sys/types.h>
@@ -61,6 +63,8 @@
 #endif
 
 #include "ptt_serpar.h"
+#include "extexception.h"
+
 
 namespace extmodem {
 
@@ -118,11 +122,14 @@ void ptt_serial_windows::set_dtr(int tx) {
 #endif
 
 #ifdef __unix__
-static void unix_print_error(int err) {
+static void unix_print_error(int err, const std::string& context) {
 	char buf[1024];
+	std::stringstream sss;
 	strerror_r(err, buf, sizeof(buf));
-	std::cerr << "Error: open() " << buf << std::endl;
-	throw std::exception();
+	sss << buf;
+	std::string message = sss.str();
+	std::cerr << "Error: " << context << ": " << buf << std::endl;
+	throw extexception(context);
 }
 
 ptt_serial_unix::~ptt_serial_unix() {
@@ -134,7 +141,9 @@ ptt_serial_unix::~ptt_serial_unix() {
 int ptt_serial_unix::init(const char* fname) {
 	fd_ = open(fname, O_RDWR, 0);
 	if (fd_ < 0) {
-		unix_print_error(errno);
+		std::string ctx = "open() fname: ";
+		ctx += fname;
+		unix_print_error(errno, ctx);
 		return 0;
 	}
 	set_tx(0);
@@ -181,12 +190,16 @@ ptt_parallel_unix::~ptt_parallel_unix() {
 int ptt_parallel_unix::init(const char* fname) {
 	fd_ = open(fname, O_RDWR, 0);
 	if (fd_ < 0) {
-		unix_print_error(errno);
+		std::string ctx = "open() fname: ";
+		ctx += fname;
+		unix_print_error(errno, ctx);
 		return 0;
 	}
 
 	if (ioctl(fd_, PPCLAIM, 0)) {
-		unix_print_error(errno);
+		std::string ctx = "ioctl() 1 fname: ";
+		ctx += fname;
+		unix_print_error(errno, ctx);
 		close (fd_);
 		return 0;
 	}
@@ -194,7 +207,9 @@ int ptt_parallel_unix::init(const char* fname) {
 	// Set the Mode
 	int mode = IEEE1284_MODE_BYTE;
 	if (ioctl(fd_, PPSETMODE, &mode)) {
-		unix_print_error(errno);
+		std::string ctx = "ioctl() 2 fname: ";
+		ctx += fname;
+		unix_print_error(errno, ctx);
 		ioctl(fd_, PPRELEASE);
 		close (fd_);
 		return 0;
@@ -203,7 +218,9 @@ int ptt_parallel_unix::init(const char* fname) {
 	// Set data pins to output
 	int dir = 0x00;
 	if (ioctl(fd_, PPDATADIR, &dir)) {
-		unix_print_error(errno);
+		std::string ctx = "ioctl() 3 fname: ";
+		ctx += fname;
+		unix_print_error(errno, ctx);
 		ioctl(fd_, PPRELEASE);
 		close (fd_);
 		return 1;

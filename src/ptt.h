@@ -43,5 +43,18 @@ public:
 	virtual int get_tx() = 0;
 };
 
+class ptt_dummy : public ptt {
+public:
+	ptt_dummy() {}
+	virtual ~ptt_dummy();
+
+	virtual int init(const char* fname);
+	virtual void set_tx(int tx);
+	virtual int get_tx();
+
+private:
+	int state_;
+};
+
 } /* namespace extmodem */
 #endif /* PTT_H_ */
