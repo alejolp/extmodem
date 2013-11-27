@@ -68,7 +68,8 @@ ptt_ptr ptt::factory(const std::string& mode) {
 	return ptt_ptr(new ptt_parallel_unix());
 #endif
 #ifdef _MSC_VER
-	return ptt_ptr(new ptt_parallel_windows());
+	throw extexception("ptt::factory unsupported mode '" + mode + "'");
+	/* return ptt_ptr(new ptt_parallel_windows()); */
 #endif
 	}
 	throw extexception("ptt::factory unknown mode '" + mode + "'");
