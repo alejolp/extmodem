@@ -10,7 +10,7 @@ there's Python everywhere, even on your cellphone.
 This is the very most simple C++ builder for small, medium and large projects
 that have only one single target binary file. Much like make, this builder
 recompiles a file only when needed, wheter the file was modified since last
-compilation, or one of the .h header files was changed.
+compilation, or one of the .h header files were changed.
 
 This script can be easily modified for different purposes. We can also decouple
 configuration from this file to build the source code under different settings.
