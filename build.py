@@ -1,18 +1,32 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Alejandro Santos LU4EXT alejolp@gmail.com
-# I hate the esoteric syntax of standard builders like make.
+"""
+Alejandro Santos LU4EXT/HB3YNQ alejolp@gmail.com
+
+I hate the esoteric syntax of standard builders like make. We're in year 2014,
+there's Python everywhere, even on your cellphone.
+
+This is the very most simple C++ builder for small, medium and large projects
+that have only one single target binary file. Much like make, this builder
+recompiles a file only when needed, wheter the file was modified since last
+compilation, or one of the .h header files was changed.
+
+This script can be easily modified for different purposes. We can also decouple
+configuration from this file to build the source code under different settings.
+I don't need that at the moment, but since this is Python the changes should
+be easy to be done.
+"""
 
 import os, sys, multiprocessing, glob
 
 FILES = glob.glob("src/*.cpp")
 
-OBJ_DIR = 'build'
+OBJ_DIR = 'bin'
 CC = 'g++'
 CFLAGS = '-MMD -g -O2 -Wall -std=c++11'
-LDFLAGS = ''
-EXECUTABLE = 'dakaraserver'
+LDFLAGS = '-lportaudio -lboost_system -lboost_program_options'
+EXECUTABLE = 'extmodem'
 JOBS_COUNT = multiprocessing.cpu_count()
 
 # g++ -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/multimon_utils.d" -MT"src/multimon_utils.d" -o "src/multimon_utils.o" "../src/multimon_utils.cpp"
@@ -43,6 +57,8 @@ def deps_func(p):
                     if os.path.getmtime(d) >= bin_mtime:
                         build = True
                         break
+            elif not os.path.exists(depsfile_path):
+                build = True
     if build:
         return (out_bin_path, f)
     return None
@@ -69,7 +85,12 @@ def main():
     pool.map(build_func, queue)
 
     if all((os.path.exists(out_bin_path) for out_bin_path, f in objs)):
-        cmd = CC + " -o \"" + os.path.join(OBJ_DIR, EXECUTABLE) + "\" " + ' '.join(objs) + " " + LDFLAGS
+        cmd = CC 
+        cmd += " -o \"" 
+        cmd += os.path.join(OBJ_DIR, EXECUTABLE) 
+        cmd += "\" "
+        cmd += ' '.join([out_bin_path for out_bin_path, f in objs]) 
+        cmd += " " + LDFLAGS
         print(cmd)
         os.system(cmd)
 
