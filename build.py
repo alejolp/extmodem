@@ -24,8 +24,8 @@ FILES = glob.glob("src/*.cpp")
 
 OBJ_DIR = 'bin'
 CC = 'g++'
-CFLAGS = '-MMD -g -O2 -Wall -std=c++11'
-LDFLAGS = '-lportaudio -lboost_system -lboost_program_options'
+CFLAGS = '-MMD -O2 -Wall -D_FORTIFY_SOURCE=2'
+LDFLAGS = '-lportaudio -lasound -lboost_system -lboost_program_options -lpthread -Wl,-z,relro'
 EXECUTABLE = 'extmodem'
 JOBS_COUNT = multiprocessing.cpu_count()
 
