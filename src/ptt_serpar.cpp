@@ -55,6 +55,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <stdio.h>
 #endif
 
 #ifdef __linux
@@ -239,19 +240,55 @@ void ptt_parallel_unix::set_tx(int tx) {
 
 	reg1 = state_ ? 0xff : 0x00;
 	reg2 = 0;
-
+        
+        
 #ifdef __FreeBSD__
-	ioctl(fd_, PPISDATA, &reg1); // High
-	ioctl(fd_, PPISDATA, &reg2); // Low
+        ioctl(fd_, PPISDATA, &reg1); // High
+        ioctl(fd_, PPISDATA, &reg2); // Low
 #else
-	ioctl(fd_, PPWDATA, &reg1); // High
-	ioctl(fd_, PPWDATA, &reg2); // Low
+        ioctl(fd_, PPWDATA, &reg1); // High
+        ioctl(fd_, PPWDATA, &reg2); // Low
 #endif
 }
-
+        
+        
 int ptt_parallel_unix::get_tx() {
-	return state_;
+      return state_;
 }
+
+
+ptt_gpio_unix::~ptt_gpio_unix() {
+}
+
+int ptt_gpio_unix::init(const char* fname) {
+  strcpy(gpio_pin_, fname);
+  sprintf(gpio_pin_, "/sys/class/gpio/%s/value", fname);
+  return 1;
+}
+
+void ptt_gpio_unix::set_tx(int tx) {
+  state_ = !!tx;
+  int fd = open(gpio_pin_, O_WRONLY);
+  if (fd < 0) {
+    std::string ctx = "open() fname: ";
+    ctx += gpio_pin_;
+    unix_print_error(errno, ctx);
+    return;
+  }
+  
+  if (state_) 
+    write(fd, "1", 1); 
+  else
+    write(fd, "0", 1);
+  close(fd);
+}
+
+int ptt_gpio_unix::get_tx() {
+  return state_;
+}
+
+
+
 #endif /* __unix__ */
 
 } /* namespace extmodem */

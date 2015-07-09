@@ -59,7 +59,7 @@ ptt_ptr ptt::factory(const std::string& mode) {
 	} else if (mode == "serial") {
 #ifdef __unix__
 	return ptt_ptr(new ptt_serial_unix());
-#endif
+#endif  
 #ifdef _MSC_VER
 	return ptt_ptr(new ptt_serial_windows());
 #endif
@@ -67,9 +67,16 @@ ptt_ptr ptt::factory(const std::string& mode) {
 #ifdef __unix__
 	return ptt_ptr(new ptt_parallel_unix());
 #endif
+#ifdef _MSC_VER       
+        throw extexception("ptt::factory unsupported mode '" + mode + "'"); 
+        /* return ptt_ptr(new ptt_parallel_windows()); */
+#endif        
+        } else if (mode == "gpio") {
+#ifdef __unix__
+        return ptt_ptr(new ptt_gpio_unix());          
+#endif
 #ifdef _MSC_VER
 	throw extexception("ptt::factory unsupported mode '" + mode + "'");
-	/* return ptt_ptr(new ptt_parallel_windows()); */
 #endif
 	}
 	throw extexception("ptt::factory unknown mode '" + mode + "'");

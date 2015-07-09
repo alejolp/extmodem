@@ -81,6 +81,22 @@ private:
 	int fd_;
 	int state_;
 };
+
+
+class ptt_gpio_unix: public ptt {
+public: 
+        ptt_gpio_unix() {}
+        virtual ~ptt_gpio_unix();
+        
+        virtual int init(const char* fname);
+        virtual void set_tx(int tx);
+        virtual int get_tx();
+private: 
+        int state_;
+        char gpio_pin_[40];
+};
+
+
 #endif
 
 } /* namespace extmodem */
