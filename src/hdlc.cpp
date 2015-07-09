@@ -122,20 +122,27 @@ void hdlc::rxbit(int bit) {
 	hdlc_.rxbitbuf >>= 1;
 }
 
+static uint16_t prev_crc = 0;
+  // It is important that this is static (shared between instances of this class)
+
 void hdlc::ax25_dispatch_packet(unsigned char *bp, unsigned int len) {
 
 	if (!check_crc_ccitt(bp, len))
 		return;
-
+        
 	// The "bp" buffer contains the CRC at the end!
 	frame_ptr new_frame(new frame(bp, len - 2));
 
 	// ax25_print_packet(new_frame, len - 2, name_.c_str(), 0);
-	new_frame->print();
+	new_frame->print(name_.c_str());
 
-	// unsigned int crc = *((unsigned short*)(&bp[len - 2]));
+        uint16_t crc = *((uint16_t*)(bp+len-2));
 
-	em_->dispatch_packet(new_frame);
+        if (crc != prev_crc)
+           em_->dispatch_packet(new_frame);
+        
+        prev_crc = crc;
+          // FIXME: Is access to this variable thread safe???
 }
 
 int check_crc_ccitt(const unsigned char *buf, int cnt) {
@@ -151,7 +158,7 @@ int calc_crc_ccitt(const unsigned char *buf, int cnt) {
 
 	for (; cnt > 0; cnt--)
 		crc = (crc >> 8) ^ crc_ccitt_table[(crc ^ *buf++) & 0xff];
-	return (crc & 0xffff);
+	return (crc & 0xffff) ^ 0xffff;
 }
 
 void ax25_print_packet(unsigned char *bp, unsigned int len, const char* name, int has_crc)

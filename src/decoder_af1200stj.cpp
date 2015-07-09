@@ -185,8 +185,9 @@ void decoder_af1200stj::init(audiosource* a) {
 void decoder_af1200stj::init_state(audiosource* a, int state_idx, int emphasis, int filter_index) {
 	int i;
 	demod_state& s = states_[state_idx];
-
-	s.hdlc_.set_name("af1200stj");
+              char buf[12]; 
+              sprintf(buf, "af1200st%d", state_idx);
+	s.hdlc_.set_name(buf);
 
 	s.sample_rate = a->get_sample_rate();
 	s.rate_index = 0;

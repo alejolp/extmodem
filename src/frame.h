@@ -59,7 +59,8 @@ public:
 	unsigned int get_crc() const { return crc_; }
 
 	void print();
-
+        void print(const char* name);
+        
 private:
 	std::vector<unsigned char> data_;
 	unsigned int crc_;
