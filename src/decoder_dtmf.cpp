@@ -34,25 +34,22 @@
 #include "audiosource.h"
 #include "decoder_dtmf.h"
 #include "multimon_utils.h"
+#include "extmodem.h"
 
 
 namespace extmodem {
 
-#define SAMPLE_RATE 22050
-
-#define BLOCKLEN (SAMPLE_RATE/100)  /* 10ms blocks */
 #define BLOCKNUM 4    /* must match numbers in multimon.h */
 
+#if 0
+#define SAMPLE_RATE 22050
+#define BLOCKLEN (SAMPLE_RATE/100)  /* 10ms blocks */
 #define PHINC(x) ((x)*0x10000/SAMPLE_RATE)
+#endif
 
 namespace {
 
 	static const char *dtmf_transl = "123A456B789C*0#D";
-
-	static const unsigned int dtmf_phinc[8] = {
-		PHINC(1209), PHINC(1336), PHINC(1477), PHINC(1633),
-		PHINC(697), PHINC(770), PHINC(852), PHINC(941)
-	};
 
 	static int find_max_idx(const float *f)
 	{
@@ -78,6 +75,25 @@ namespace {
 
 decoder_dtmf::decoder_dtmf(modem* em) : em_(em) {
 	std::memset(&dtmf, 0, sizeof(dtmf));
+
+	sample_rate_ = em->get_audiosource()->get_sample_rate();
+	blocklen_ = (sample_rate_/100);
+
+	/*
+	unsigned int dtmf_phinc[8] = {
+			PHINC(1209), PHINC(1336), PHINC(1477), PHINC(1633),
+			PHINC(697), PHINC(770), PHINC(852), PHINC(941)
+		};
+		*/
+
+	dtmf_phinc[0] = PHINC(1209);
+	dtmf_phinc[1] = PHINC(1336);
+	dtmf_phinc[2] = PHINC(1477);
+	dtmf_phinc[3] = PHINC(1633);
+	dtmf_phinc[4] = PHINC(697);
+	dtmf_phinc[5] = PHINC(770);
+	dtmf_phinc[6] = PHINC(852);
+	dtmf_phinc[7] = PHINC(941);
 }
 
 decoder_dtmf::~decoder_dtmf() {}
@@ -104,7 +120,7 @@ int decoder_dtmf::process_block()
 	memmove(dtmf.tenergy+1, dtmf.tenergy,
 		sizeof(dtmf.tenergy) - sizeof(dtmf.tenergy[0]));
 	memset(dtmf.tenergy, 0, sizeof(dtmf.tenergy[0]));
-	tote *= (BLOCKNUM*BLOCKLEN*0.5);  /* adjust for block lengths */
+	tote *= (BLOCKNUM*blocklen_*0.5);  /* adjust for block lengths */
 	/*
 	verbprintf(10, "DTMF: Energies: %8.5f  %8.5f %8.5f %8.5f %8.5f  %8.5f %8.5f %8.5f %8.5f\n",
 		   tote, totte[0], totte[1], totte[2], totte[3], totte[4], totte[5], totte[6], totte[7]);
@@ -132,7 +148,7 @@ void decoder_dtmf::input_callback(audiosource* a, const float* buffer, unsigned 
 			dtmf.ph[i] += dtmf_phinc[i];
 		}
 		if ((dtmf.blkcount--) <= 0) {
-			dtmf.blkcount = BLOCKLEN;
+			dtmf.blkcount = blocklen_;
 			i = process_block();
 			if (i != dtmf.lastch && i >= 0) {
 				std::cerr << "DTMF: " << dtmf_transl[i] << std::endl;

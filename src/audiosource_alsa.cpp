@@ -37,7 +37,7 @@ void audiosource_alsa::init() {
 	}
 
 	if ((err = snd_pcm_set_params(p_handle_,
-			SND_PCM_FORMAT_S16_LE,
+			SND_PCM_FORMAT_S16,
 			SND_PCM_ACCESS_RW_INTERLEAVED,
 			get_out_channel_count(),
 			get_sample_rate(),
@@ -55,7 +55,7 @@ void audiosource_alsa::init() {
 	}
 
 	if ((err = snd_pcm_set_params(c_handle_,
-			SND_PCM_FORMAT_S16_LE,
+			SND_PCM_FORMAT_S16,
 			SND_PCM_ACCESS_RW_INTERLEAVED,
 			get_in_channel_count(),
 			get_sample_rate(),

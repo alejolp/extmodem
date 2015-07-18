@@ -47,6 +47,13 @@ private:
 	int process_block();
 
 	modem* em_;
+
+	unsigned int dtmf_phinc[8];
+	int sample_rate_;
+	int blocklen_;
+
+	template <typename T>
+	inline T PHINC(T x) { return ((x)*0x10000/sample_rate_); }
 };
 
 } /* namespace extmodem */
