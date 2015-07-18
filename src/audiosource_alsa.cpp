@@ -37,7 +37,7 @@ void audiosource_alsa::init() {
 	}
 
 	if ((err = snd_pcm_set_params(p_handle_,
-			SND_PCM_FORMAT_FLOAT,
+			SND_PCM_FORMAT_S16_LE,
 			SND_PCM_ACCESS_RW_INTERLEAVED,
 			get_out_channel_count(),
 			get_sample_rate(),
@@ -55,7 +55,7 @@ void audiosource_alsa::init() {
 	}
 
 	if ((err = snd_pcm_set_params(c_handle_,
-			SND_PCM_FORMAT_FLOAT,
+			SND_PCM_FORMAT_S16_LE,
 			SND_PCM_ACCESS_RW_INTERLEAVED,
 			get_in_channel_count(),
 			get_sample_rate(),
@@ -80,22 +80,31 @@ void audiosource_alsa::close() {
 }
 
 void audiosource_alsa::loop() {
-	std::vector<float> buffer;
+	std::vector<short> buffer;
+	std::vector<float> bufferf;
 	snd_pcm_sframes_t frames;
 
-	buffer.resize(512);
+	buffer.resize(1024);
+	bufferf.resize(1024);
 
 	for (;;) {
 		/* Read data from the soundcard */
-		frames = snd_pcm_readi(c_handle_, buffer.data(), buffer.size() * sizeof(float));
+		frames = snd_pcm_readi(c_handle_, buffer.data(), buffer.size() * sizeof(short));
 		if (frames > 0 && get_listener()) {
-			get_listener()->input_callback(this, buffer.data(), frames);
+			for (int i = 0; i < frames; ++i) {
+				bufferf[i] = buffer[i] * 1.0 / 32768.0f;
+			}
+			get_listener()->input_callback(this, bufferf.data(), frames);
 		}
 
 		/* Write data to the soundcard */
-		get_listener()->output_callback(this, buffer.data(), buffer.size());
+		get_listener()->output_callback(this, bufferf.data(), bufferf.size());
 
-        frames = snd_pcm_writei(p_handle_, buffer.data(), buffer.size() * sizeof(float));
+		for (size_t i = 0 ; i < bufferf.size(); ++i) {
+			buffer[i] = static_cast<short>( bufferf[i] * 32767 );
+		}
+
+        frames = snd_pcm_writei(p_handle_, buffer.data(), buffer.size() * sizeof(short));
         if (frames < 0)
                 frames = snd_pcm_recover(p_handle_, frames, 0);
         if (frames < 0) {

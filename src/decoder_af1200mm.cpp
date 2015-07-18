@@ -40,6 +40,7 @@
 #include "decoder_af1200mm.h"
 #include "multimon_utils.h"
 #include "audiosource.h"
+#include "extmodem.h"
 
 
 namespace extmodem {
@@ -53,44 +54,42 @@ namespace extmodem {
 
 #define FREQ_MARK  1200
 #define FREQ_SPACE 2200
-#define FREQ_SAMP  22050
 #define BAUD       1200
 #define SUBSAMP    2
 
 /* ---------------------------------------------------------------------- */
 
+/*
+#define FREQ_SAMP  22050
 #define CORRLEN ((int)(FREQ_SAMP/BAUD))
 #define SPHASEINC (0x10000u*BAUD*SUBSAMP/FREQ_SAMP)
-
-namespace {
-
-	static float corr_mark_i[CORRLEN];
-	static float corr_mark_q[CORRLEN];
-	static float corr_space_i[CORRLEN];
-	static float corr_space_q[CORRLEN];
-	static bool were_tables_init = false;
-
-}
+*/
 
 decoder_af1200mm::decoder_af1200mm(modem* em) : hdlc_(em) {
 	float f;
-	int i;
+	size_t i;
 
 	std::memset(&afsk12, 0, sizeof(afsk12));
 	hdlc_.set_name("af1200 mm");
 
-	if (!were_tables_init) {
-		were_tables_init = true;
-		for (f = 0, i = 0; i < CORRLEN; i++) {
-			corr_mark_i[i] = std::cos(f);
-			corr_mark_q[i] = std::sin(f);
-			f += (float)(2.0*M_PI*FREQ_MARK/FREQ_SAMP);
-		}
-		for (f = 0, i = 0; i < CORRLEN; i++) {
-			corr_space_i[i] = std::cos(f);
-			corr_space_q[i] = std::sin(f);
-			f += (float)(2.0*M_PI*FREQ_SPACE/FREQ_SAMP);
-		}
+	const int FREQ_SAMP = em->get_audiosource()->get_sample_rate();
+	corrlen_ = (FREQ_SAMP/BAUD);
+	sphaseinc_ = (0x10000u*BAUD*SUBSAMP/FREQ_SAMP);
+
+	corr_mark_i.resize(corrlen_);
+	corr_mark_q.resize(corrlen_);
+	corr_space_i.resize(corrlen_);
+	corr_space_q.resize(corrlen_);
+
+	for (f = 0, i = 0; i < corrlen_; i++) {
+		corr_mark_i[i] = std::cos(f);
+		corr_mark_q[i] = std::sin(f);
+		f += (float)(2.0*M_PI*FREQ_MARK/FREQ_SAMP);
+	}
+	for (f = 0, i = 0; i < corrlen_; i++) {
+		corr_space_i[i] = std::cos(f);
+		corr_space_q[i] = std::sin(f);
+		f += (float)(2.0*M_PI*FREQ_SPACE/FREQ_SAMP);
 	}
 }
 
@@ -144,10 +143,10 @@ void decoder_af1200mm::input_callback_real(audiosource* a, const float* buffer, 
 	/* FIXME: THIS CONVOLUTION IS CPU INTENSIVE */
 
 	for (; length >= SUBSAMP; length -= SUBSAMP, buffer += SUBSAMP) {
-		f = fsqr(mac(buffer, corr_mark_i, CORRLEN)) +
-			fsqr(mac(buffer, corr_mark_q, CORRLEN)) -
-			fsqr(mac(buffer, corr_space_i, CORRLEN)) -
-			fsqr(mac(buffer, corr_space_q, CORRLEN));
+		f = fsqr(mac(buffer, corr_mark_i.data(), corrlen_)) +
+			fsqr(mac(buffer, corr_mark_q.data(), corrlen_)) -
+			fsqr(mac(buffer, corr_space_i.data(), corrlen_)) -
+			fsqr(mac(buffer, corr_space_q.data(), corrlen_));
 		afsk12.dcd_shreg <<= 1;
 		afsk12.dcd_shreg |= (f > 0);
 		// verbprintf(10, "%c", '0'+(afsk12.dcd_shreg & 1));
@@ -155,12 +154,12 @@ void decoder_af1200mm::input_callback_real(audiosource* a, const float* buffer, 
 		 * check if transition
 		 */
 		if ((afsk12.dcd_shreg ^ (afsk12.dcd_shreg >> 1)) & 1) {
-			if (afsk12.sphase < (0x8000u-(SPHASEINC/2)))
-				afsk12.sphase += SPHASEINC/8;
+			if (afsk12.sphase < (0x8000u-(sphaseinc_/2)))
+				afsk12.sphase += sphaseinc_/8;
 			else
-				afsk12.sphase -= SPHASEINC/8;
+				afsk12.sphase -= sphaseinc_/8;
 		}
-		afsk12.sphase += SPHASEINC;
+		afsk12.sphase += sphaseinc_;
 		if (afsk12.sphase >= 0x10000u) {
 			afsk12.sphase &= 0xffffu;
 			afsk12.lasts <<= 1;

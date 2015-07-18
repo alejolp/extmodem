@@ -57,6 +57,13 @@ private:
 
 	hdlc hdlc_;
 	std::vector<float> tmp_inbuffer_;
+
+	unsigned int corrlen_;
+	unsigned int sphaseinc_;
+	std::vector<float> corr_mark_i;
+	std::vector<float> corr_mark_q;
+	std::vector<float> corr_space_i;
+	std::vector<float> corr_space_q;
 };
 
 } /* namespace extmodem */

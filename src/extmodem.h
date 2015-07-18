@@ -47,6 +47,7 @@ public:
 	virtual ~modem();
 
 	void set_audiosource(audiosource_ptr p);
+	audiosource* get_audiosource() { return audio_source_.get(); }
 	void add_decoder(decoder_ptr p, int ch_num);
 
 	void set_encoder(encoder_ptr p);
