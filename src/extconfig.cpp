@@ -57,9 +57,9 @@ void config::init(int argc, char** argv) {
 	    ("ptt-port", po::value<std::string>(&ptt_port_)->default_value("/dev/ttyS0"), "set serial/parallel port PTT file name")
 	    ("tx-delay", po::value<int>(&tx_delay_)->default_value(200), "set tx-delay in ms")
 	    ("tx-tail", po::value<int>(&tx_tail_)->default_value(50), "set tx-tail in ms")
-	    ("sample-rate,s", po::value<int>(&tx_tail_)->default_value(22050), "sample rate")
-	    ("in-chan", po::value<int>(&tx_tail_)->default_value(2), "input channel count")
-	    ("out-chan", po::value<int>(&tx_tail_)->default_value(2), "output channel count")
+	    ("sample-rate,s", po::value<int>(&sample_rate_)->default_value(22050), "sample rate")
+	    ("in-chan", po::value<int>(&in_channels_count_)->default_value(2), "input channel count")
+	    ("out-chan", po::value<int>(&out_channels_count_)->default_value(2), "output channel count")
 	    ("alsa-device", po::value<std::string>(&alsa_device_)->default_value("default"), "ALSA device string")
 	;
 
