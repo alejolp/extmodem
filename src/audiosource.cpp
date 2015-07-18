@@ -20,6 +20,9 @@
 
 #include "audiosource.h"
 
+#include "extconfig.h"
+
+
 /* FIXME */
 
 namespace extmodem {
@@ -27,5 +30,13 @@ namespace extmodem {
 audiosource::audiosource(int sample_rate) : sample_rate_(sample_rate), listener_(0) {}
 
 audiosource::~audiosource() {}
+
+int audiosource::get_in_channel_count() {
+	return config::Instance()->in_chan_count();
+}
+
+int audiosource::get_out_channel_count() {
+	return config::Instance()->out_chan_count();
+}
 
 } /* namespace extmodem */

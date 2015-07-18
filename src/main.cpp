@@ -36,8 +36,6 @@
 
 using namespace extmodem;
 
-#define SAMPLE_RATE 22050
-
 int main(int argc, char **argv) {
 	config* cfg = config::Instance();
 
@@ -52,9 +50,9 @@ int main(int argc, char **argv) {
 	boost::shared_ptr<audiosource> as;
 
 	if (cfg->audio_backend() == "portaudio") {
-		as.reset(new audiosource_portaudio(SAMPLE_RATE));
+		as.reset(new audiosource_portaudio(cfg->sample_rate()));
 	} else if (cfg->audio_backend() == "alsa") {
-		as.reset(new audiosource_alsa(SAMPLE_RATE));
+		as.reset(new audiosource_alsa(cfg->sample_rate()));
 	} else {
 		std::cerr << "ERROR: Invalid audio backend" << std::endl;
 		return 1;
@@ -64,7 +62,7 @@ int main(int argc, char **argv) {
 
 	em->set_audiosource(as);
 
-	for (i = 0; i < 1 /* as->get_channel_count() */; ++i) {
+	for (i = 0; i < cfg->in_chan_count(); ++i) {
 		em->add_decoder(decoder_ptr(new decoder_dtmf(em.get())), i);
 		em->add_decoder(decoder_ptr(new decoder_af1200mm(em.get())), i);
 		em->add_decoder(decoder_ptr(new decoder_af1200stj(em.get())), i);

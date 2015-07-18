@@ -51,8 +51,8 @@ public:
 	audiosourcelistener* get_listener() const { return listener_; }
 
 	int get_sample_rate() const { return sample_rate_; }
-	int get_in_channel_count() const { return 2; }
-	int get_out_channel_count() const { return 2; }
+	int get_in_channel_count();
+	int get_out_channel_count();
 
 private:
 	int sample_rate_;

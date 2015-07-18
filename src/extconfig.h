@@ -54,6 +54,9 @@ public:
 	int tx_delay() const { return tx_delay_; }
 	int tx_tail() const { return tx_tail_; }
 	bool debug() const { return debug_; }
+	int sample_rate() const { return sample_rate_; }
+	int in_chan_count() const { return in_channels_count_; }
+	int out_chan_count() const { return out_channels_count_; }
 
 private:
 	po::options_description desc;
@@ -68,6 +71,9 @@ private:
 	int tx_delay_;
 	int tx_tail_;
 	bool debug_;
+	int sample_rate_;
+	int in_channels_count_;
+	int out_channels_count_;
 };
 
 } /* namespace extmodem */
