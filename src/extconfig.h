@@ -57,6 +57,7 @@ public:
 	int sample_rate() const { return sample_rate_; }
 	int in_chan_count() const { return in_channels_count_; }
 	int out_chan_count() const { return out_channels_count_; }
+	std::string alsa_device() const { return alsa_device_; }
 
 private:
 	po::options_description desc;
@@ -74,6 +75,7 @@ private:
 	int sample_rate_;
 	int in_channels_count_;
 	int out_channels_count_;
+	std::string alsa_device_;
 };
 
 } /* namespace extmodem */

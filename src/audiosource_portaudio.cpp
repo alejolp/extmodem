@@ -135,13 +135,13 @@ void audiosource_portaudio::init() {
                                 static_cast<void*>(this) ); /*This is a pointer that will be passed to
                                                    your callback*/
 	if( err != paNoError ) {
-		std::cerr << "PortAudio error: " << Pa_GetErrorText( err ) << std::endl;
+		std::cerr << "PortAudio in error: " << Pa_GetErrorText( err ) << std::endl;
 		throw audiosourceexception("Pa_OpenDefaultStream");
 	}
 
 	err = Pa_StartStream( stream_in );
 	if( err != paNoError ) {
-		std::cerr << "PortAudio error: " << Pa_GetErrorText( err ) << std::endl;
+		std::cerr << "PortAudio in error: " << Pa_GetErrorText( err ) << std::endl;
 		throw audiosourceexception("Pa_StartStream");
 	}
 
@@ -162,13 +162,13 @@ void audiosource_portaudio::init() {
                                 static_cast<void*>(this) ); /*This is a pointer that will be passed to
                                                    your callback*/
 	if( err != paNoError ) {
-		std::cerr << "PortAudio error: " << Pa_GetErrorText( err ) << std::endl;
+		std::cerr << "PortAudio out error: " << Pa_GetErrorText( err ) << std::endl;
 		throw audiosourceexception("Pa_OpenDefaultStream");
 	}
 
 	err = Pa_StartStream( stream_out );
 	if( err != paNoError ) {
-		std::cerr << "PortAudio error: " << Pa_GetErrorText( err ) << std::endl;
+		std::cerr << "PortAudio out error: " << Pa_GetErrorText( err ) << std::endl;
 		throw audiosourceexception("Pa_StartStream");
 	}
 }

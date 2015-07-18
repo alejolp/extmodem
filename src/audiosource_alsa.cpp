@@ -14,6 +14,8 @@
 
 #include "audiosource_alsa.h"
 
+#include "extconfig.h"
+
 namespace extmodem {
 
 audiosource_alsa::audiosource_alsa(int sample_rate) : audiosource(sample_rate), p_handle_(0), c_handle_(0) {
@@ -26,10 +28,10 @@ audiosource_alsa::~audiosource_alsa() {
 
 void audiosource_alsa::init() {
     int err;
-    const char *device = "default";
+    std::string device = config::Instance()->alsa_device();
 
-	if ((err = snd_pcm_open(&p_handle_, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
-		std::cerr << "snd_pcm_open error: " << snd_strerror(err) << std::endl;
+	if ((err = snd_pcm_open(&p_handle_, device.c_str(), SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
+		std::cerr << "snd_pcm_open SND_PCM_STREAM_PLAYBACK error: " << snd_strerror(err) << std::endl;
 		close();
 		throw audiosourceexception("snd_pcm_open");
 	}
@@ -41,13 +43,13 @@ void audiosource_alsa::init() {
 			get_sample_rate(),
 			1, /* FIXME: resample? */
 			500000)) < 0) { /* 0.5sec */
-		std::cerr << "snd_pcm_set_params error: " << snd_strerror(err) << std::endl;
+		std::cerr << "snd_pcm_set_params playback error: " << snd_strerror(err) << std::endl;
 		close();
 		throw audiosourceexception("snd_pcm_open");
 	}
 
-	if ((err = snd_pcm_open(&c_handle_, device, SND_PCM_STREAM_CAPTURE, 0)) < 0) {
-		std::cerr << "snd_pcm_open error: " << snd_strerror(err) << std::endl;
+	if ((err = snd_pcm_open(&c_handle_, device.c_str(), SND_PCM_STREAM_CAPTURE, 0)) < 0) {
+		std::cerr << "snd_pcm_open SND_PCM_STREAM_CAPTURE error: " << snd_strerror(err) << std::endl;
 		close();
 		throw audiosourceexception("snd_pcm_open");
 	}
@@ -59,7 +61,7 @@ void audiosource_alsa::init() {
 			get_sample_rate(),
 			1, /* FIXME: resample? */
 			500000)) < 0) { /* 0.5sec */
-		std::cerr << "snd_pcm_set_params error: " << snd_strerror(err) << std::endl;
+		std::cerr << "snd_pcm_set_params capture error: " << snd_strerror(err) << std::endl;
 		close();
 		throw audiosourceexception("snd_pcm_open");
 	}

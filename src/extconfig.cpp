@@ -60,6 +60,7 @@ void config::init(int argc, char** argv) {
 	    ("sample-rate,s", po::value<int>(&tx_tail_)->default_value(22050), "sample rate")
 	    ("in-chan", po::value<int>(&tx_tail_)->default_value(2), "input channel count")
 	    ("out-chan", po::value<int>(&tx_tail_)->default_value(2), "output channel count")
+	    ("alsa-device", po::value<std::string>(&alsa_device_)->default_value("default"), "ALSA device string")
 	;
 
 	p_.add("config-file", -1);
