@@ -41,6 +41,10 @@ namespace {
 			unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo,
 			PaStreamCallbackFlags statusFlags, void *userData)
 	{
+		(void)output;
+		(void)timeInfo;
+		(void)statusFlags;
+
 		audiosource_portaudio* pa = static_cast<audiosource_portaudio*>(userData);
 
 		if (pa->get_listener()) {
@@ -54,6 +58,10 @@ namespace {
 			unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo,
 			PaStreamCallbackFlags statusFlags, void *userData)
 	{
+		(void)input;
+		(void)timeInfo;
+		(void)statusFlags;
+
 		audiosource_portaudio* pa = static_cast<audiosource_portaudio*>(userData);
 
 		// std::cerr << " out buffer size " << frameCount << " flags " << statusFlags << std::endl;

@@ -29,7 +29,7 @@ decoder::decoder() {}
 decoder::~decoder() {}
 
 void decoder::init(audiosource* a) {
-
+	(void)a;
 }
 
 } /* namespace extmodem */

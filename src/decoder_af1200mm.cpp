@@ -99,6 +99,7 @@ decoder_af1200mm::~decoder_af1200mm() {
 }
 
 void decoder_af1200mm::input_callback(audiosource* a, const float* buffer, unsigned long length) {
+	(void)a;
 
 	/*
 	 * "mm" codec need a relatively huge chuck of contiguous samples to work reliably.
@@ -124,6 +125,8 @@ void decoder_af1200mm::input_callback(audiosource* a, const float* buffer, unsig
 }
 
 void decoder_af1200mm::input_callback_real(audiosource* a, const float* buffer, unsigned long length) {
+	(void)a;
+
 	float f;
 	unsigned char curbit;
 

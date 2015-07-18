@@ -234,6 +234,8 @@ void decoder_af1200stj::init_state(audiosource* a, int state_idx, int emphasis, 
 }
 
 void decoder_af1200stj::input_callback_state(audiosource* a, const float* buffer, unsigned long length, int state_idx) {
+	(void)a;
+
 	demod_state& s = states_[state_idx];
 	unsigned i=0;
 	while (i<length) {

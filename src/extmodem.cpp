@@ -78,6 +78,7 @@ void modem::input_callback(audiosource* a, const float* buffer, unsigned long le
 }
 
 void modem::output_callback(audiosource* a, float* buffer, unsigned long length) {
+	(void)a;
 	// int channel_count = a->get_out_channel_count();
 
 	if (encoder_.get()) {

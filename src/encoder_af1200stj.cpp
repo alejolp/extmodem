@@ -55,6 +55,7 @@ encoder_af1200stj::~encoder_af1200stj() {
 }
 
 void encoder_af1200stj::output_callback(audiosource* a, float* buffer, unsigned long length) {
+	(void)a;
 	int num_channels = a->get_out_channel_count();
 	int ch_idx;
 	std::size_t i = 0;

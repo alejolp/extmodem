@@ -31,6 +31,7 @@
 #include <cstdarg>
 
 int verbprintf(int log_level, const char* fmt, ...) {
+	(void)log_level;
 	va_list vl;
 	va_start(vl, fmt);
 	return vfprintf(stderr, fmt, vl);

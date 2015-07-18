@@ -136,7 +136,7 @@ EXTMODEM_VCPP_ALIGN(1) struct agwpe_tcp_frame {
 		struct {
 			uint8_t baudRate;
 			uint8_t trafficLevel;
-			uint8_t txDelay;;
+			uint8_t txDelay;
 			uint8_t txTail;
 			uint8_t persist;
 			uint8_t slotTime;

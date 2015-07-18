@@ -119,6 +119,7 @@ int decoder_dtmf::process_block()
 }
 
 void decoder_dtmf::input_callback(audiosource* a, const float* buffer, unsigned long length) {
+	(void)a;
 	float s_in;
 	int i;
 

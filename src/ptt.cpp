@@ -86,6 +86,7 @@ ptt_ptr ptt::factory(const std::string& mode) {
 ptt_dummy::~ptt_dummy() {}
 
 int ptt_dummy::init(const char* fname) {
+	(void)fname;
 	state_ = 0;
 	return 1;
 }
