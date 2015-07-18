@@ -73,6 +73,10 @@ void tcpserver::flush_output_queue() {
 }
 
 void tcpserver::write_to_all_safe(frame_ptr fp) {
+	if (config::Instance()->debug()) {
+		fp->print("DEBUG");
+	}
+
 	{
 		boost::lock_guard<boost::mutex> guard_(output_queue_mutex_);
 		output_queue_.push_back(fp);
