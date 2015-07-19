@@ -23,6 +23,7 @@
 #include <exception>
 
 #include "audiosource_portaudio.h"
+#include "extconfig.h"
 
 namespace extmodem {
 
@@ -111,7 +112,7 @@ void audiosource_portaudio::init() {
 	}
 
 	//int frames_per_buffer = get_sample_rate();
-	int frames_per_buffer = paFramesPerBufferUnspecified;
+	int frames_per_buffer = config::Instance()->frames_per_buff();
 
 	/*
 	 * We have two separate streams for input and output to work-around a Debian specific

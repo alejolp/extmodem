@@ -21,6 +21,7 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+
 #include <string>
 
 #include <boost/program_options.hpp>
@@ -58,6 +59,7 @@ public:
 	int in_chan_count() const { return in_channels_count_; }
 	int out_chan_count() const { return out_channels_count_; }
 	std::string alsa_device() const { return alsa_device_; }
+	int frames_per_buff() const { return frames_per_buff_; }
 
 private:
 	po::options_description desc;
@@ -76,6 +78,7 @@ private:
 	int in_channels_count_;
 	int out_channels_count_;
 	std::string alsa_device_;
+	int frames_per_buff_;
 };
 
 } /* namespace extmodem */
