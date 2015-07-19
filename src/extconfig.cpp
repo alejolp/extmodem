@@ -61,7 +61,7 @@ void config::init(int argc, char** argv) {
 	    ("in-chan", po::value<int>(&in_channels_count_)->default_value(2), "input channel count")
 	    ("out-chan", po::value<int>(&out_channels_count_)->default_value(2), "output channel count")
 	    ("alsa-device", po::value<std::string>(&alsa_device_)->default_value("default"), "ALSA device string")
-	    ("frames-per-buffer", po::value<int>(&frames_per_buff_)->default_value(22050), "frames per buffer, bigger increases latency")
+	    ("frames-per-buffer", po::value<int>(&frames_per_buff_)->default_value(8192), "frames per buffer, bigger increases latency")
 	;
 
 	p_.add("config-file", -1);

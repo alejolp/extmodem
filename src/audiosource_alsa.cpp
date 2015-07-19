@@ -89,8 +89,8 @@ void audiosource_alsa::loop_async_thread_proc() {
 	snd_pcm_sframes_t frames;
 	int ret;
 
-	buffer.resize(1024);
-	bufferf.resize(1024);
+	buffer.resize(config::Instance()->frames_per_buff());
+	bufferf.resize(config::Instance()->frames_per_buff());
 
 	if ((ret = snd_pcm_prepare(c_handle_)) < 0) {
 		std::cerr << "snd_pcm_prepare capture error: " << snd_strerror(ret) << std::endl;
@@ -118,8 +118,8 @@ void audiosource_alsa::loop_async_thread_proc() {
 
 		if (frames < 0) {
 			std::cerr << "snd_pcm_readi error: " << snd_strerror(frames) << std::endl;
-			break;
 		}
+
 		if (frames > 0 && get_listener()) {
 			for (int i = 0; i < frames; ++i) {
 				bufferf[i] = buffer[i] * 1.0 / 32768.0f;
@@ -135,11 +135,11 @@ void audiosource_alsa::loop_async_thread_proc() {
 		}
 
         frames = snd_pcm_writei(p_handle_, buffer.data(), buffer.size() * sizeof(short));
-        if (frames < 0)
+        if (frames < 0) {
                 frames = snd_pcm_recover(p_handle_, frames, 0);
+        }
         if (frames < 0) {
     			std::cerr << "snd_pcm_writei error: " << snd_strerror(frames) << std::endl;
-                break;
         }
         if (frames > 0 && frames < (snd_pcm_sframes_t)buffer.size()) {
 			std::cerr << "ALSA short write, expected " << buffer.size() << " wrote " << frames << std::endl;
