@@ -32,7 +32,7 @@ public:
 	explicit audiosource_portaudio(int sample_rate);
 	virtual ~audiosource_portaudio();
 
-	virtual void loop();
+	virtual void loop_async();
 
 private:
 	void init();

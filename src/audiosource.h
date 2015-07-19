@@ -45,7 +45,7 @@ public:
 	explicit audiosource(int sample_rate);
 	virtual ~audiosource();
 
-	virtual void loop() = 0;
+	virtual void loop_async() = 0;
 
 	void set_listener(audiosourcelistener* p) { listener_ = p; }
 	audiosourcelistener* get_listener() const { return listener_; }

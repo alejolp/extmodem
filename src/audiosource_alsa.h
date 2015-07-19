@@ -10,6 +10,8 @@
 
 #include <alsa/asoundlib.h>
 
+#include <boost/thread.hpp>
+
 #include "audiosource.h"
 
 namespace extmodem {
@@ -19,15 +21,19 @@ public:
 	explicit audiosource_alsa(int sample_rate);
 	virtual ~audiosource_alsa();
 
-	virtual void loop();
+	virtual void loop_async();
 
 private:
+
+	void loop_async_thread_proc();
+
 	void init();
 	void close();
 
 private:
 	snd_pcm_t *p_handle_;
 	snd_pcm_t *c_handle_;
+	boost::thread thread_;
 };
 
 } /* namespace extmodem */

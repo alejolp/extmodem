@@ -28,7 +28,7 @@ set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
 # boost_locale requires 1.48.0+
-find_package( Boost 1.49.0 REQUIRED COMPONENTS system program_options )
+find_package( Boost 1.49.0 REQUIRED COMPONENTS system program_options thread )
 include_directories(${Boost_INCLUDE_DIRS})
 
 file(GLOB_RECURSE EXTMODEM_SOURCES "src/*.cpp")

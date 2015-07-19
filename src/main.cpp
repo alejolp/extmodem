@@ -72,8 +72,9 @@ int main(int argc, char **argv) {
 
 	std::cerr << "Started!" << std::endl;
 
+	as->loop_async();
+
 	em->start_and_run();
-	as->loop();
 
 	return 0;
 }

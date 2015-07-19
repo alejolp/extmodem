@@ -205,10 +205,8 @@ void audiosource_portaudio::close() {
 	}
 }
 
-void audiosource_portaudio::loop() {
-	for (;;) {
-		Pa_Sleep(1000);
-	}
+void audiosource_portaudio::loop_async() {
+
 }
 
 

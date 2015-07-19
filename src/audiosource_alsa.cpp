@@ -11,9 +11,9 @@
 #include <exception>
 #include <vector>
 
+#include <boost/bind.hpp>
 
 #include "audiosource_alsa.h"
-
 #include "extconfig.h"
 
 namespace extmodem {
@@ -79,7 +79,11 @@ void audiosource_alsa::close() {
 	}
 }
 
-void audiosource_alsa::loop() {
+void audiosource_alsa::loop_async() {
+	thread_ = boost::thread(boost::bind(&audiosource_alsa::loop_async_thread_proc, this));
+}
+
+void audiosource_alsa::loop_async_thread_proc() {
 	std::vector<short> buffer;
 	std::vector<float> bufferf;
 	snd_pcm_sframes_t frames;
