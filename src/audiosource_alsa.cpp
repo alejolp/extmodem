@@ -87,13 +87,32 @@ void audiosource_alsa::loop_async_thread_proc() {
 	std::vector<short> buffer;
 	std::vector<float> bufferf;
 	snd_pcm_sframes_t frames;
+	int ret;
 
 	buffer.resize(1024);
 	bufferf.resize(1024);
 
+	if ((ret = snd_pcm_prepare(c_handle_)) < 0) {
+		std::cerr << "snd_pcm_prepare capture error: " << snd_strerror(ret) << std::endl;
+		close();
+		return;
+	}
+
+	if ((ret = snd_pcm_prepare(p_handle_)) < 0) {
+		std::cerr << "snd_pcm_prepare playback error: " << snd_strerror(ret) << std::endl;
+		close();
+		return;
+	}
+
 	for (;;) {
 		/* Read data from the soundcard */
 		frames = snd_pcm_readi(c_handle_, buffer.data(), buffer.size() * sizeof(short));
+		if (frames < 0)
+			frames = snd_pcm_recover(c_handle_, frames, 0);
+		if (frames < 0) {
+			std::cerr << "snd_pcm_writei error: " << snd_strerror(frames) << std::endl;
+			break;
+		}
 		if (frames > 0 && get_listener()) {
 			for (int i = 0; i < frames; ++i) {
 				bufferf[i] = buffer[i] * 1.0 / 32768.0f;
