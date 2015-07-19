@@ -106,7 +106,7 @@ void audiosource_alsa::loop_async_thread_proc() {
 
 	for (;;) {
 		/* Read data from the soundcard */
-		frames = snd_pcm_readi(c_handle_, buffer.data(), buffer.size() * sizeof(short));
+		frames = snd_pcm_readi(c_handle_, buffer.data(), buffer.size());
 
 		if (frames == -EPIPE) {
 			std::cerr << "snd_pcm_readi EPIPE OVERRUN error: " << snd_strerror(frames) << std::endl;
@@ -134,7 +134,7 @@ void audiosource_alsa::loop_async_thread_proc() {
 			buffer[i] = static_cast<short>( bufferf[i] * 32767 );
 		}
 
-        frames = snd_pcm_writei(p_handle_, buffer.data(), buffer.size() * sizeof(short));
+        frames = snd_pcm_writei(p_handle_, buffer.data(), buffer.size());
         if (frames < 0) {
                 frames = snd_pcm_recover(p_handle_, frames, 0);
         }
