@@ -48,12 +48,15 @@ void audiosource_alsa::init() {
 		throw audiosourceexception("snd_pcm_set_params");
 	}
 
+	snd_pcm_hw_params_t *hw_params;
+
 	if ((err = snd_pcm_open(&c_handle_, device.c_str(), SND_PCM_STREAM_CAPTURE, 0)) < 0) {
 		std::cerr << "snd_pcm_open capture error: " << snd_strerror(err) << std::endl;
 		close();
 		throw audiosourceexception("snd_pcm_open");
 	}
 
+#if 0
 	if ((err = snd_pcm_set_params(c_handle_,
 			SND_PCM_FORMAT_S16,
 			SND_PCM_ACCESS_RW_INTERLEAVED,
@@ -65,7 +68,52 @@ void audiosource_alsa::init() {
 		close();
 		throw audiosourceexception("snd_pcm_set_params");
 	}
+#endif
 
+
+	if ((err = snd_pcm_hw_params_malloc (&hw_params)) < 0) {
+		std::cerr << "cannot allocate hardware parameter structure " << snd_strerror (err) << std::endl;
+		throw audiosourceexception("snd_pcm_hw_params_malloc");
+	}
+
+	if ((err = snd_pcm_hw_params_any (c_handle_, hw_params)) < 0) {
+		std::cerr << "cannot initialize hardware parameter structure " << snd_strerror (err) << std::endl;
+		throw audiosourceexception("snd_pcm_hw_params_any");
+	}
+
+	if ((err = snd_pcm_hw_params_set_access (c_handle_, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0) {
+		std::cerr << "alsa error " << snd_strerror (err) << std::endl;
+		throw audiosourceexception("snd_pcm_hw_params_set_access");
+	}
+
+	if ((err = snd_pcm_hw_params_set_format (c_handle_, hw_params, SND_PCM_FORMAT_S16)) < 0) {
+		std::cerr << "alsa error " << snd_strerror (err) << std::endl;
+		throw audiosourceexception("snd_pcm_hw_params_set_format");
+	}
+
+	unsigned int rate = get_sample_rate();
+
+	if ((err = snd_pcm_hw_params_set_rate_near (c_handle_, hw_params, &rate, 0)) < 0) {
+		std::cerr << "alsa error " << snd_strerror (err) << std::endl;
+		throw audiosourceexception("snd_pcm_hw_params_set_rate_near");
+	}
+
+	if ((int)rate != get_sample_rate()) {
+		std::cerr << "requested rate " << get_sample_rate() << " not available got " << rate << std::endl;
+		throw audiosourceexception("error");
+	}
+
+	if ((err = snd_pcm_hw_params_set_channels (c_handle_, hw_params, get_in_channel_count())) < 0) {
+		std::cerr << "alsa error " << snd_strerror (err) << std::endl;
+		throw audiosourceexception("snd_pcm_hw_params_set_channels");
+	}
+
+	if ((err = snd_pcm_hw_params (c_handle_, hw_params)) < 0) {
+		std::cerr << "alsa error " << snd_strerror (err) << std::endl;
+		throw audiosourceexception("snd_pcm_hw_params");
+	}
+
+	snd_pcm_hw_params_free (hw_params);
 }
 
 void audiosource_alsa::close() {
@@ -127,8 +175,13 @@ void audiosource_alsa::loop_async_thread_proc() {
 			get_listener()->input_callback(this, bufferf.data(), frames);
 		}
 
-		/* Write data to the soundcard */
-		get_listener()->output_callback(this, bufferf.data(), bufferf.size());
+		if (get_listener()) {
+			for (size_t i = 0 ; i < bufferf.size(); ++i) {
+				bufferf[i] = 0;
+			}
+			/* Write data to the soundcard */
+			get_listener()->output_callback(this, bufferf.data(), bufferf.size());
+		}
 
 		for (size_t i = 0 ; i < bufferf.size(); ++i) {
 			buffer[i] = static_cast<short>( bufferf[i] * 32767 );
