@@ -132,13 +132,14 @@ void audiosource_alsa::loop_async() {
 }
 
 void audiosource_alsa::loop_async_thread_proc() {
+	config* cfg = config::Instance();
 	std::vector<short> buffer;
 	std::vector<float> bufferf;
 	snd_pcm_sframes_t frames;
 	int ret;
 
-	buffer.resize(config::Instance()->frames_per_buff());
-	bufferf.resize(config::Instance()->frames_per_buff());
+	buffer.resize(cfg->frames_per_buff());
+	bufferf.resize(cfg->frames_per_buff());
 
 	if ((ret = snd_pcm_prepare(c_handle_)) < 0) {
 		std::cerr << "snd_pcm_prepare capture error: " << snd_strerror(ret) << std::endl;
@@ -157,7 +158,8 @@ void audiosource_alsa::loop_async_thread_proc() {
 		frames = snd_pcm_readi(c_handle_, buffer.data(), buffer.size());
 
 		if (frames == -EPIPE) {
-			std::cerr << "snd_pcm_readi EPIPE OVERRUN error: " << snd_strerror(frames) << std::endl;
+			if (cfg->debug())
+				std::cerr << "snd_pcm_readi EPIPE OVERRUN error: " << snd_strerror(frames) << std::endl;
 			snd_pcm_prepare(c_handle_);
 			frames = 0;
 		} else if (frames < 0) {
@@ -165,7 +167,8 @@ void audiosource_alsa::loop_async_thread_proc() {
 		}
 
 		if (frames < 0) {
-			std::cerr << "snd_pcm_readi error: " << snd_strerror(frames) << std::endl;
+			if (cfg->debug())
+				std::cerr << "snd_pcm_readi error: " << snd_strerror(frames) << std::endl;
 		}
 
 		if (frames > 0 && get_listener()) {
@@ -192,10 +195,12 @@ void audiosource_alsa::loop_async_thread_proc() {
                 frames = snd_pcm_recover(p_handle_, frames, 0);
         }
         if (frames < 0) {
+        	if (cfg->debug())
     			std::cerr << "snd_pcm_writei error: " << snd_strerror(frames) << std::endl;
         }
         if (frames > 0 && frames < (snd_pcm_sframes_t)buffer.size()) {
-			std::cerr << "ALSA short write, expected " << buffer.size() << " wrote " << frames << std::endl;
+        	if (cfg->debug())
+        		std::cerr << "ALSA short write, expected " << buffer.size() << " wrote " << frames << std::endl;
         }
 	}
 

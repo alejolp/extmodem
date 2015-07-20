@@ -58,7 +58,9 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	std::cerr << "Starting extmodem ... " << std::endl;
+	if (cfg->debug()) {
+		std::cerr << "Starting extmodem ... " << std::endl;
+	}
 
 	em->set_audiosource(as);
 
@@ -70,7 +72,9 @@ int main(int argc, char **argv) {
 
 	em->set_encoder(encoder_ptr(new encoder_af1200stj()));
 
-	std::cerr << "Started!" << std::endl;
+	if (cfg->debug()) {
+		std::cerr << "Started!" << std::endl;
+	}
 
 	as->loop_async();
 
