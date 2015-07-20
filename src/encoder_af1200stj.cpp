@@ -59,7 +59,7 @@ void encoder_af1200stj::output_callback(audiosource* a, float* buffer, unsigned 
 	int num_channels = a->get_out_channel_count();
 	int ch_idx;
 	std::size_t i = 0;
-	std::size_t buffer_size = length * num_channels;
+	std::size_t buffer_size = length;
 
 	/* BEWARE: The channels samples are INTERLEAVED. There are (length * num_channels) elements in "buffer" array. */
 

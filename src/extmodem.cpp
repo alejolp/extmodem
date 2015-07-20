@@ -51,11 +51,12 @@ void modem::set_encoder(encoder_ptr p) {
 
 
 void modem::input_callback(audiosource* a, const float* buffer, unsigned long length) {
-	int channel_count = a->get_in_channel_count();
-	int ch_idx, k, deco_idx;
+	unsigned int channel_count = (unsigned int) a->get_in_channel_count();
+	unsigned long ch_idx, k, p, deco_idx;
 
 	if (channel_count == 1) {
-		for (deco_idx = 0; deco_idx < (int)decoders_[0].size(); ++deco_idx) {
+		/* fast path, do not make a copy */
+		for (deco_idx = 0; deco_idx < decoders_[0].size(); ++deco_idx) {
 			decoders_[0][deco_idx]->input_callback(a, buffer, length);
 		}
 	} else {
@@ -66,12 +67,12 @@ void modem::input_callback(audiosource* a, const float* buffer, unsigned long le
 
 		for (ch_idx = 0; ch_idx < channel_count; ++ch_idx) {
 			/* Copy each channel data contiguously */
-			for (k = 0; k < (int)length; ++k) {
-				tmpdata[k] = buffer[channel_count * k + ch_idx];
+			for (k = 0, p = 0; p < length; ++k, p += channel_count) {
+				tmpdata[k] = buffer[p];
 			}
 
-			for (deco_idx = 0; deco_idx < (int)decoders_[ch_idx].size(); ++deco_idx) {
-				decoders_[ch_idx][deco_idx]->input_callback(a, tmpdata.data(), length);
+			for (deco_idx = 0; deco_idx < decoders_[ch_idx].size(); ++deco_idx) {
+				decoders_[ch_idx][deco_idx]->input_callback(a, tmpdata.data(), k);
 			}
 		}
 	}

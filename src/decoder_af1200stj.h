@@ -45,15 +45,15 @@ private:
 
 	struct demod_state {
 		demod_state(modem* em) : hdlc_(em) {}
-		int rate_index;
-		int sample_rate;
-		int samples_per_bit;
-		int emphasis;
-		int filter_index;
-		float* td_filter;
-		std::size_t td_filter_length;
-		float* cd_filter;
-		std::size_t cd_filter_length;
+		int rate_index{};
+		int sample_rate{};
+		int samples_per_bit{};
+		int emphasis{};
+		int filter_index{};
+		float* td_filter{};
+		std::size_t td_filter_length{};
+		float* cd_filter{};
+		std::size_t cd_filter_length{};
 		std::vector<float> x;
 		std::vector<float> u1;
 		std::vector<float> c0_real;
@@ -61,17 +61,17 @@ private:
 		std::vector<float> c1_real;
 		std::vector<float> c1_imag;
 		std::vector<float> diff;
-		float phase_inc_f0;
-		float phase_inc_f1;
-		float phase_inc_symbol;
-		float phase_f0;
-		float phase_f1;
-		std::size_t j_td; // time domain index
-		std::size_t j_cd; // time domain index
-		std::size_t j_corr; // correlation index
-		std::size_t t;
-		float previous_fdiff;
-		std::size_t last_transition;
+		float phase_inc_f0{};
+		float phase_inc_f1{};
+		float phase_inc_symbol{};
+		float phase_f0{};
+		float phase_f1{};
+		std::size_t j_td{}; // time domain index
+		std::size_t j_cd{}; // time domain index
+		std::size_t j_corr{}; // correlation index
+		std::size_t t{};
+		float previous_fdiff{};
+		std::size_t last_transition{};
 		hdlc hdlc_;
 	};
 	std::vector<demod_state> states_;
