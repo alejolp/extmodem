@@ -100,7 +100,7 @@ The executable should be at  `build/extradio`
 
 ### Raspberry Pi Support
 
-I'm running extmodem on my RPi. To compile with cmake I'm you can:
+I'm running extmodem on my RPi. To compile with cmake you can:
 
     mkdir build
     cd build
