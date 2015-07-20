@@ -1,48 +1,69 @@
 
 Sound card modem for Amateur Radio AX25
-=================================================
+=======================================
 
-Web page:  http://extradio.sourceforge.net/extmodem.html
+Web page (old): http://extradio.sourceforge.net/extmodem.html
 
+This is a modem for AFSK AX25 packet (1200 bps APRS compatible). It is capable to both send and receive packets. The main feature of this program is that it is currently running three different demodulators in parallel, increasing the quality of reception. The first modem is Thomas Sailer's multimon, the other two are described by Sivan Toledo in this QEX article: http://www.tau.ac.il/~stoledo/Bib/Pubs/QEX-JulAug-2012.pdf
+
+Since the core of the extmodem runs the same algorithm as javAX25, the number of demodulated packets should be better than soundmodem. 
 
 Windows Files
 -------------
 
-Precompiled Windows binaries (EXE) can be found here:
-
-* http://sourceforge.net/projects/extradio/files/extmodem/
-
-You may need the VC++ 2010 runtime, available here:
-
-* http://www.microsoft.com/en-us/download/details.aspx?id=5555
+I no longer provide Windows binaries. The program should compile cleanly on VC2010. Help needed.
 
 Usage
 -----
 
 Open a new terminal (Start-Execute-"cmd" on windows) and ask for the program's help:
 
-    extmodem-vcpp2010.exe --help
-
+    extmodem.exe --help
+    
     Allowed options:
-      -h [ --help ]                produce help message
-      -d [ --debug ]               produce debug messages
-      --config-file arg            configuration file name
-      --kiss-tcp-port arg (=6666)  set KISS TCP listening port
-      --ptt-port arg (=/dev/ttyS0) set serial port PTT name
-      --tx-delay arg (=200)        set tx-delay in ms
-      --tx-tail arg (=50)          set tx-tail in ms
+      -h [ --help ]                     produce help message
+      -d [ --debug ]                    produce debug messages
+      --config-file arg                 configuration file name
+      --audio-backend arg (=portaudio)  Audio backend: portaudio,alsa
+      --kiss-tcp-port arg (=6666)       set KISS TCP listening port
+      --agwpe-tcp-port arg (=8000)      set AGWPE emulator TCP listening port
+      --ptt-mode arg (=serial)          PTT mode: serial,parallel,null
+      --ptt-port arg (=/dev/ttyS0)      set serial/parallel port PTT file name
+      --tx-delay arg (=200)             set tx-delay in ms
+      --tx-tail arg (=50)               set tx-tail in ms
+      -s [ --sample-rate ] arg (=22050) sample rate
+      --in-chan arg (=2)                input channel count
+      --out-chan arg (=2)               output channel count
+      --alsa-device arg (=default)      ALSA device string
+      --frames-per-buffer arg (=8192)   frames per buffer, bigger increases latency
 
 You should at least set the PTT Port, Usually COMx on Windows and /dev/ttySX on Linux and Unix.
 
-The program prints the received packets on the screen.
+The program prints the received packets on the screen having the -d switch.
 
-It also opens a TCP KISS interface running at port 6666. You can use any TCP KISS capable program to send and receive packets, ie "aprx":
+### Testing with DTMF
+
+Extmodem provides a DTMF decoder for testing. You can use your handheld radio to test the decoder by sending DTMF codes. You should be able to see on the screen the decoded DTMF code.
+
+### APRX - TCP Kiss Support
+
+Extmodem opens a TCP KISS interface running at port 6666. You can use any TCP KISS capable program to send and receive packets, ie "aprx":
 
     <interface>
       tcp-device 127.0.0.1 6666 KISS
       callsign LU0EXT-1
       tx-ok false
     </interface>
+
+### AGWPE Support
+
+You can use UI-VIEW32 with extmodem. This program supports a preliminary version of the AGWPE protocol, effectively emulating its behaviour. It opens a TCP socket on port 8000, the AGWPE default. 
+
+### Example on the RPi
+
+This is my command line on the Raspberry Pi. I am using an external USB sound card interface:
+
+    ./extmodem --ptt-mode null --audio-backend alsa --alsa-device "hw:1" -s 44100 --out-chan 2 --in-chan 1 --debug
 
 Build from source
 -----------------
@@ -57,21 +78,34 @@ The source code should be at the "extmodem" directory.
 
 ### Compile
 
-On Linux systems you can compile with g++ using the "build.py" script. You need:
+On Linux systems you can compile with g++ using cmake. You need:
 
-* Python to run the build script
+* Modern C++ compiler with C++11 support
+* CMAKE
 * Boost C++ library development files
 * PortAudio VERSION 19 library development files
 
 On Debian and Ubuntu you can install the required packages easily:
 
-    aptitude install build-essential g++ portaudio19-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev
+    aptitude install cmake build-essential g++ portaudio19-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev
 
 Then just type, at the "extmodem" directory:
 
-    python build.py
+    mkdir build
+    cd build
+    CFLAGS=-O2 CXXFLAGS=-O2 cmake ..
+    make -j4
 
-The executable should be at  `bin/extradio`
+The executable should be at  `build/extradio`
+
+### Raspberry Pi Support
+
+I'm running extmodem on my RPi. To compile with cmake I'm you can:
+
+    mkdir build
+    cd build
+    CXX=$(which g++-4.8) CC=$(which gcc-4.8) CFLAGS=-O2 CXXFLAGS=-O2 cmake ..
+    make -j4
 
 License
 -------
