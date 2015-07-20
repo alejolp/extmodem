@@ -2,6 +2,8 @@
 Sound card modem for Amateur Radio AX25
 =======================================
 
+By Alejandro Santos, LU4EXT / HB3YNQ. alejolp@gmail.com.
+
 Web page (old): http://extradio.sourceforge.net/extmodem.html
 
 This is a modem for AFSK AX25 packet (1200 bps APRS compatible). It is capable to both send and receive packets. The main feature of this program is that it is currently running three different demodulators in parallel, increasing the quality of reception. The first modem is Thomas Sailer's multimon, the other two are described by Sivan Toledo in this QEX article: http://www.tau.ac.il/~stoledo/Bib/Pubs/QEX-JulAug-2012.pdf
@@ -44,6 +46,24 @@ The program prints the received packets on the screen having the -d switch.
 ### Testing with DTMF
 
 Extmodem provides a DTMF decoder for testing. You can use your handheld radio to test the decoder by sending DTMF codes. You should be able to see on the screen the decoded DTMF code.
+
+### Selecting the sound device to use.
+
+Using the alsa backend you can use the --alsa-device command line option to select another sound device, ie, hw:1. This option only works with the ALSA backend.
+
+The portaudio backend always use the default sound card, which in turn by default uses the default ALSA device. To select a different ALSA device you should edit your asoundrc ALSA file. For example:
+
+    # cat /etc/asound.conf 
+
+    pcm.!default {
+            type hw
+            card 1
+    }
+
+    ctl.!default {
+            type hw           
+            card 1
+    }
 
 ### APRX - TCP Kiss Support
 
