@@ -5,6 +5,8 @@
  *      Author: alejo
  */
 
+#ifdef ALSA_FOUND
+
 #include <cmath>
 #include <cstdio>
 #include <iostream>
@@ -208,3 +210,5 @@ void audiosource_alsa::loop_async_thread_proc() {
 }
 
 } /* namespace extmodem */
+
+#endif

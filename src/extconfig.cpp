@@ -53,7 +53,7 @@ void config::init(int argc, char** argv) {
 	    ("audio-backend", po::value<std::string>(&audio_backend_)->default_value("portaudio"), "Audio backend: portaudio,alsa")
 	    ("kiss-tcp-port", po::value<int>(&kiss_tcp_port_)->default_value(6666), "set KISS TCP listening port")
 	    ("agwpe-tcp-port", po::value<int>(&agwpe_tcp_port_)->default_value(8000), "set AGWPE emulator TCP listening port")
-	    ("ptt-mode", po::value<std::string>(&ptt_mode_)->default_value("serial"), "PTT mode: serial,parallel,null")
+	    ("ptt-mode", po::value<std::string>(&ptt_mode_)->default_value("serial"), "PTT mode: serial,parallel,gpio,hamlib,null")
 	    ("ptt-port", po::value<std::string>(&ptt_port_)->default_value("/dev/ttyS0"), "set serial/parallel port PTT file name")
 	    ("tx-delay", po::value<int>(&tx_delay_)->default_value(200), "set tx-delay in ms")
 	    ("tx-tail", po::value<int>(&tx_tail_)->default_value(50), "set tx-tail in ms")
@@ -62,6 +62,7 @@ void config::init(int argc, char** argv) {
 	    ("out-chan", po::value<int>(&out_channels_count_)->default_value(2), "output channel count")
 	    ("alsa-device", po::value<std::string>(&alsa_device_)->default_value("default"), "ALSA device string")
 	    ("frames-per-buffer", po::value<int>(&frames_per_buff_)->default_value(8192), "frames per buffer, bigger increases latency")
+		("hamlib-model", po::value<int>(&hamlib_model_)->default_value(-1), "hamlib Rig Model, -1 for auto detection")
 	;
 
 	p_.add("config-file", -1);

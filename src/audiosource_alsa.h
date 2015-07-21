@@ -8,6 +8,8 @@
 #ifndef AUDIOSOURCE_ALSA_H_
 #define AUDIOSOURCE_ALSA_H_
 
+#ifdef ALSA_FOUND
+
 #include <alsa/asoundlib.h>
 
 #include <boost/thread.hpp>
@@ -37,4 +39,7 @@ private:
 };
 
 } /* namespace extmodem */
+
+#endif
+
 #endif /* AUDIOSOURCE_ALSA_H_ */

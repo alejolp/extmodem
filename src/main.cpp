@@ -50,9 +50,19 @@ int main(int argc, char **argv) {
 	boost::shared_ptr<audiosource> as;
 
 	if (cfg->audio_backend() == "portaudio") {
+#ifdef PORTAUDIO_FOUND
 		as.reset(new audiosource_portaudio(cfg->sample_rate()));
+#else
+		std::cerr << "ERROR: PORTAUDIO support not compiled" << std::endl;
+		return 1;
+#endif
 	} else if (cfg->audio_backend() == "alsa") {
+#if ALSA_FOUND
 		as.reset(new audiosource_alsa(cfg->sample_rate()));
+#else
+		std::cerr << "ERROR: ALSA support not compiled" << std::endl;
+		return 1;
+#endif
 	} else {
 		std::cerr << "ERROR: Invalid audio backend" << std::endl;
 		return 1;

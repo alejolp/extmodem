@@ -60,6 +60,7 @@ public:
 	int out_chan_count() const { return out_channels_count_; }
 	std::string alsa_device() const { return alsa_device_; }
 	int frames_per_buff() const { return frames_per_buff_; }
+	int hamlib_model() const { return hamlib_model_; }
 
 private:
 	po::options_description desc;
@@ -79,6 +80,7 @@ private:
 	int out_channels_count_;
 	std::string alsa_device_;
 	int frames_per_buff_;
+	int hamlib_model_;
 };
 
 } /* namespace extmodem */

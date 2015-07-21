@@ -18,36 +18,35 @@
  *      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef AUDIOSOURCE_PORTAUDIO_H_
-#define AUDIOSOURCE_PORTAUDIO_H_
+#ifndef SRC_PTT_HAMLIB_H_
+#define SRC_PTT_HAMLIB_H_
 
-#ifdef PORTAUDIO_FOUND
+#ifdef HAMLIB_FOUND
 
-#include <portaudio.h>
-#include "audiosource.h"
+#include <hamlib/rig.h>
 
+#include "ptt.h"
 
 namespace extmodem {
 
-class audiosource_portaudio : public audiosource {
+class ptt_hamlib : public ptt {
 public:
-	explicit audiosource_portaudio(int sample_rate);
-	virtual ~audiosource_portaudio();
+	ptt_hamlib();
+	virtual ~ptt_hamlib();
 
-	virtual void loop_async();
+	virtual int init(const char* fname);
+	virtual void set_tx(int tx);
+	virtual int get_tx();
 
-private:
-	void init();
 	void close();
 
 private:
-	PaStream *stream_in;
-	PaStream *stream_out;
-	PaError err;
+	RIG *rig_;
+	bool ptt_;
 };
 
 } /* namespace extmodem */
 
 #endif
 
-#endif /* AUDIOSOURCE_PORTAUDIO_H_ */
+#endif /* SRC_PTT_HAMLIB_H_ */

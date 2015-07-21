@@ -18,6 +18,8 @@
  *      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifdef PORTAUDIO_FOUND
+
 #include <cmath>
 #include <iostream>
 #include <exception>
@@ -210,5 +212,6 @@ void audiosource_portaudio::loop_async() {
 
 }
 
-
 } /* namespace extmodem */
+
+#endif

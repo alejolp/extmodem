@@ -41,6 +41,7 @@
 
 #include "ptt.h"
 #include "ptt_serpar.h"
+#include "ptt_hamlib.h"
 #include "extexception.h"
 
 namespace extmodem {
@@ -77,6 +78,10 @@ ptt_ptr ptt::factory(const std::string& mode) {
 #endif
 #ifdef _MSC_VER
 	throw extexception("ptt::factory unsupported mode '" + mode + "'");
+#endif
+	} else if (mode == "hamlib") {
+#ifdef HAMLIB_FOUND
+		return ptt_ptr(new ptt_hamlib());
 #endif
 	}
 	throw extexception("ptt::factory unknown mode '" + mode + "'");
