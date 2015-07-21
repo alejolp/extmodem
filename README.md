@@ -29,7 +29,7 @@ Open a new terminal (Start-Execute-"cmd" on windows) and ask for the program's h
       --audio-backend arg (=portaudio)  Audio backend: portaudio,alsa
       --kiss-tcp-port arg (=6666)       set KISS TCP listening port
       --agwpe-tcp-port arg (=8000)      set AGWPE emulator TCP listening port
-      --ptt-mode arg (=serial)          PTT mode: serial,parallel,null
+      --ptt-mode arg (=serial)          PTT mode: serial,parallel,gpio,hamlib,null
       --ptt-port arg (=/dev/ttyS0)      set serial/parallel port PTT file name
       --tx-delay arg (=200)             set tx-delay in ms
       --tx-tail arg (=50)               set tx-tail in ms
@@ -38,6 +38,7 @@ Open a new terminal (Start-Execute-"cmd" on windows) and ask for the program's h
       --out-chan arg (=2)               output channel count
       --alsa-device arg (=default)      ALSA device string
       --frames-per-buffer arg (=8192)   frames per buffer, bigger increases latency
+      --hamlib-model arg (=-1)          hamlib Rig Model, -1 for auto detection
 
 You should at least set the PTT Port, Usually COMx on Windows and /dev/ttySX on Linux and Unix.
 
