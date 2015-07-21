@@ -116,7 +116,7 @@ Then just type, at the "extmodem" directory:
     CFLAGS=-O2 CXXFLAGS=-O2 cmake ..
     make -j4
 
-The executable should be at  `build/extradio`
+The executable should be at  `build/extmodem`
 
 ### Raspberry Pi Support
 
