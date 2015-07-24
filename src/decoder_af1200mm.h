@@ -49,6 +49,7 @@ private:
 	void input_callback_real(audiosource* a, const float* input, unsigned long frameCount);
 
 	struct l1_state_afsk12 {
+		l1_state_afsk12() : dcd_shreg(0), sphase(0), lasts(0), subsamp(0) {}
 		unsigned int dcd_shreg;
 		unsigned int sphase;
 		unsigned int lasts;

@@ -50,6 +50,11 @@ private:
 	void ax25_dispatch_packet(unsigned char *bp, unsigned int len);
 
 	struct l2_state_hdlc {
+		l2_state_hdlc() : rxptr(0), rxstate(0), rxbitstream(0), rxbitbuf(0) {
+			for (unsigned int i = 0; i < (sizeof(rxbuf) / sizeof(rxbuf[0])); ++i)
+				rxbuf[i] = 0;
+		}
+
 		unsigned char rxbuf[1024];
 		unsigned char *rxptr;
 		unsigned int rxstate;

@@ -139,9 +139,10 @@ void audiosource_alsa::loop_async_thread_proc() {
 	std::vector<float> bufferf;
 	snd_pcm_sframes_t frames;
 	int ret;
+	int buf_size = (cfg->frames_per_buff() > 0) ? cfg->frames_per_buff() : (get_sample_rate());
 
-	buffer.resize(cfg->frames_per_buff());
-	bufferf.resize(cfg->frames_per_buff());
+	buffer.resize(buf_size);
+	bufferf.resize(buf_size);
 
 	if ((ret = snd_pcm_prepare(c_handle_)) < 0) {
 		std::cerr << "snd_pcm_prepare capture error: " << snd_strerror(ret) << std::endl;
@@ -194,13 +195,15 @@ void audiosource_alsa::loop_async_thread_proc() {
 
         frames = snd_pcm_writei(p_handle_, buffer.data(), buffer.size());
         if (frames < 0) {
-                frames = snd_pcm_recover(p_handle_, frames, 0);
+        	if (cfg->debug())
+    			std::cerr << "snd_pcm_writei error: " << snd_strerror(frames) << " RECOVER..." << std::endl;
+			frames = snd_pcm_recover(p_handle_, frames, 0);
         }
         if (frames < 0) {
         	if (cfg->debug())
     			std::cerr << "snd_pcm_writei error: " << snd_strerror(frames) << std::endl;
         }
-        if (frames > 0 && frames < (snd_pcm_sframes_t)buffer.size()) {
+        if (frames < (snd_pcm_sframes_t)buffer.size()) {
         	if (cfg->debug())
         		std::cerr << "ALSA short write, expected " << buffer.size() << " wrote " << frames << std::endl;
         }

@@ -72,7 +72,7 @@ namespace {
 		if (pa->get_listener()) {
 			float* foutput = static_cast<float*>(output);
 
-			pa->get_listener()->output_callback(pa, foutput, frameCount);
+			pa->get_listener()->output_callback(pa, foutput, frameCount * pa->get_out_channel_count());
 
 #if 0
 			int num_channels = pa->get_out_channel_count();
