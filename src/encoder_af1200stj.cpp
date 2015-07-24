@@ -97,6 +97,8 @@ void encoder_af1200stj::output_callback(audiosource* a, float* buffer, unsigned 
 				boost::lock_guard<boost::mutex> guard_(out_queue_mutex_);
 				out_queue_.pop_front();
 				out_queue_ptr_ = 0;
+			} else {
+				p->erase(p->begin(), p->begin() + out_queue_ptr_);
 			}
 		}
 	}

@@ -42,7 +42,7 @@ public:
 
 private:
 	RIG *rig_;
-	bool ptt_;
+	int state_;
 };
 
 } /* namespace extmodem */

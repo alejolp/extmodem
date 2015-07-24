@@ -30,7 +30,7 @@
 
 namespace extmodem {
 
-ptt_hamlib::ptt_hamlib() : rig_(0), ptt_(0) {
+ptt_hamlib::ptt_hamlib() : rig_(0), state_(0) {
 
 }
 
@@ -100,7 +100,7 @@ void ptt_hamlib::close() {
 }
 
 void ptt_hamlib::set_tx(int tx) {
-	if (tx != ptt_) {
+	if (tx != state_) {
 		int retcode;
 
 		 /* stand back ! */
@@ -110,12 +110,12 @@ void ptt_hamlib::set_tx(int tx) {
 			std::cerr << "rig_set_ptt: error = " << rigerror(retcode) << std::endl;
 		}
 
-		ptt_ = tx;
+		state_ = !!tx;
 	}
 }
 
 int ptt_hamlib::get_tx() {
-	return ptt_;
+	return state_;
 }
 
 } /* namespace extmodem */
