@@ -23,8 +23,10 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
     endif()
 
-    add_definition( -DBOOST_ALL_NO_LIB )
-    add_definition( -D_WIN32_WINNT=0x0501 )
+    add_definitions( -DBOOST_ALL_NO_LIB )
+
+    # MSVC complains otherwise
+    add_definitions( -D_WIN32_WINNT=0x0501 )
 endif()
 
 ### BOOST ###
