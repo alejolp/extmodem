@@ -1,4 +1,7 @@
 
+[![Build status](https://ci.appveyor.com/api/projects/status/nm79pmxbjytquyx0?svg=true)](https://ci.appveyor.com/project/alejolp/extmodem)
+
+
 Sound card modem for Amateur Radio AX25
 =======================================
 
@@ -13,7 +16,7 @@ Since the core of the extmodem runs the same algorithm as javAX25, the number of
 Windows Files
 -------------
 
-I no longer provide Windows binaries. The program should compile cleanly on VC2010. Help needed.
+Windows 64-bit binaries can be found at: http://files.dakaraonline.org/extmodem/
 
 Usage
 -----
