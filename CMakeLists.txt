@@ -24,6 +24,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
     endif()
 
     add_definitions( -DBOOST_ALL_NO_LIB )
+    add_definitions( -DBOOST_ALL_DYN_LINK )
 
     # MSVC complains otherwise
     add_definitions( -D_WIN32_WINNT=0x0501 )
