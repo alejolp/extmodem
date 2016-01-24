@@ -1,0 +1,71 @@
+# appveyor.yml
+
+version: "{branch}-ci-{build}"
+clone_depth: 5 
+
+os: Visual Studio 2015
+
+platform:
+  - x64
+
+configuration:
+  - Release
+
+environment:
+  global:
+    BOOST_INCLUDEDIR: C:/Libraries/boost_1_59_0
+    BOOST_LIBRARYDIR: C:/Libraries/boost_1_59_0/lib64-msvc-14.0
+    BUILD_TYPE: Release
+    CMAKE_INCLUDE_PATH: C:/projects/extmodem/deps/portaudio/build/native/include
+    CMAKE_LIBRARY_PATH: C:/projects/extmodem/deps/portaudio/build/native/bin
+    EXTMODEM_ARTIFACT: extmodem-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_BUILD_NUMBER%-%APPVEYOR_JOB_ID%.zip
+
+init:
+  - cmd: cmake --version
+  - cmd: msbuild /version
+  - cmd: echo %platform%
+
+before_build:
+  - mkdir deps
+  - mkdir deps\include
+  - mkdir deps\lib
+  - nuget install portaudio -OutputDirectory deps -ExcludeVersion 
+
+build_script:
+#  - dir /s /p %BOOST_ROOT%
+  - dir /s /p deps
+  - echo %configuration%
+  - mkdir build
+  - pushd .
+  - cd build
+  - cmake --version
+  - cmake -G "Visual Studio 14 2015 Win64" ..
+  - cmake --build . --config Release
+
+build:
+  parallel: true
+  verbosity: detailed
+
+after_build:
+  - 7z a -mx=9 -xr!.git -xr!extmodem.dir -xr!*.ilk -xr!*.pdb -xr!*.nupkg -xr!deps %EXTMODEM_ARTIFACT% %APPVEYOR_BUILD_FOLDER%
+  - appveyor PushArtifact %EXTMODEM_ARTIFACT%
+
+artifacts:
+  - path: '*.zip'
+    name: extmodem
+
+deploy:
+  - provider: FTP
+    protocol: ftps
+    server:
+      secure: C6tkq+q/3l6LiQ4CGNgMhLWvzaajInbUEeruKHhC2lo=
+    username:
+      secure: rV1YaUrUXNT47IZB1YVFO/D29cj5pGxga5fox8pEy9s=
+    password:
+      secure: b0B/dtBHOEaFQAqiyT4Ysg==
+    folder: /extmodem
+    artifact: 
+
+branches:
+  only:
+    - master
