@@ -33,7 +33,7 @@ before_build:
 
 build_script:
 #  - dir /s /p %BOOST_ROOT%
-  - dir /s /p deps
+#  - dir /s /p deps
   - echo %configuration%
   - mkdir build
   - pushd .
