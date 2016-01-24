@@ -17,7 +17,7 @@ environment:
     BOOST_LIBRARYDIR: C:/Libraries/boost_1_59_0/lib64-msvc-14.0
     BUILD_TYPE: Release
     CMAKE_INCLUDE_PATH: C:/projects/extmodem/deps/portaudio/build/native/include
-    CMAKE_LIBRARY_PATH: C:/projects/extmodem/deps/portaudio/build/native/bin
+    CMAKE_LIBRARY_PATH: C:/projects/extmodem/deps/portaudio/build/native/lib/x64/v120/Release
     EXTMODEM_ARTIFACT: extmodem-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_BUILD_NUMBER%-%APPVEYOR_JOB_ID%.zip
 
 init:
