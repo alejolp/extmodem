@@ -18,6 +18,7 @@ environment:
     BUILD_TYPE: Release
     CMAKE_INCLUDE_PATH: C:/projects/extmodem/deps/portaudio/build/native/include
     CMAKE_LIBRARY_PATH: C:/projects/extmodem/deps/portaudio/build/native/lib/x64/v120/Release
+    PORTAUDIO_DLL_PATH: C:/projects/extmodem/deps/portaudio.redist/build/native/bin/x64/v120/Release
     EXTMODEM_ARTIFACT: extmodem-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_BUILD_NUMBER%-%APPVEYOR_JOB_ID%.zip
 
 init:
@@ -47,6 +48,10 @@ build:
   verbosity: detailed
 
 after_build:
+  - cp %PORTAUDIO_DLL_PATH%/portaudio_x64.dll %APPVEYOR_BUILD_FOLDER%/Release
+  - cp %BOOST_LIBRARYDIR%/boost_program_options-vc140-mt-1_59.dll %APPVEYOR_BUILD_FOLDER%/Release
+  - cp %BOOST_LIBRARYDIR%/boost_system-vc140-mt-1_59.dll %APPVEYOR_BUILD_FOLDER%/Release
+  - cp %BOOST_LIBRARYDIR%/boost_thread-vc140-mt-1_59.dll %APPVEYOR_BUILD_FOLDER%/Release
   - 7z a -mx=9 -xr!.git -xr!extmodem.dir -xr!*.ilk -xr!*.pdb -xr!*.nupkg -xr!deps %EXTMODEM_ARTIFACT% %APPVEYOR_BUILD_FOLDER%
   - appveyor PushArtifact %EXTMODEM_ARTIFACT%
 
