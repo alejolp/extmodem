@@ -33,6 +33,7 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 # boost_locale requires 1.48.0+
 find_package( Boost 1.49.0 REQUIRED COMPONENTS system program_options thread )
 include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND EXTMODEM_LIBS ${Boost_LIBRARIES})
 
 ### ALSA ###
