@@ -72,7 +72,7 @@ void kiss_session::handle_incoming_data(const unsigned char* buffer, std::size_t
 					else
 						std::cout << "New local frame" << std::endl;
 
-					new_frame->print();
+					new_frame->print("TCP");
 
 					get_kiss_server()->get_modem()->output_packet_to_sc(new_frame);
 				}

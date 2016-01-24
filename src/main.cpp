@@ -21,6 +21,8 @@
 
 #include "audiosource_portaudio.h"
 #include "audiosource_alsa.h"
+#include "audiosource_null.h"
+#include "audiosource_loopback.h"
 #include "extmodem.h"
 #include "extconfig.h"
 
@@ -49,7 +51,11 @@ int main(int argc, char **argv) {
 	boost::shared_ptr<modem> em(new modem());
 	boost::shared_ptr<audiosource> as;
 
-	if (cfg->audio_backend() == "portaudio") {
+	if (cfg->audio_backend() == "null") {
+		as.reset(new audiosource_null(cfg->sample_rate()));
+	} else if (cfg->audio_backend() == "loopback") {
+		as.reset(new audiosource_loopback(cfg->sample_rate()));
+	} else if (cfg->audio_backend() == "portaudio") {
 #ifdef PORTAUDIO_FOUND
 		as.reset(new audiosource_portaudio(cfg->sample_rate()));
 #else

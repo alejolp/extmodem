@@ -67,7 +67,7 @@ void modem::input_callback(audiosource* a, const float* buffer, unsigned long le
 
 		for (ch_idx = 0; ch_idx < channel_count; ++ch_idx) {
 			/* Copy each channel data contiguously */
-			for (k = 0, p = 0; p < length; ++k, p += channel_count) {
+			for (k = 0, p = ch_idx; p < length; ++k, p += channel_count) {
 				tmpdata[k] = buffer[p];
 			}
 

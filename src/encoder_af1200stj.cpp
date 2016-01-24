@@ -185,8 +185,12 @@ void encoder_af1200stj::send(frame_ptr fp) {
 	{
 		boost::lock_guard<boost::mutex> guard_(out_queue_mutex_);
 		// FIXME: Do something more interesting than silently dropping the frame.
-		if (out_queue_.size() > 5)
+		if (out_queue_.size() > 5) {
+			if (config::Instance()->debug()) {
+				std::cout << "WARN dropping frame, output queue size=" << out_queue_.size() << std::endl;
+			}
 			return;
+		}
 	}
 
 	tx_symbol_phase = tx_dds_phase = 0.0f;
@@ -198,7 +202,7 @@ void encoder_af1200stj::send(frame_ptr fp) {
 	out.reset(new std::vector<float>());
 
 	// Preamble
-	for (k = out->size(); ((out->size() - k) * 1000) / sample_rate_ < tx_delay; )
+	for (k = 0; k < (tx_delay * 1200) / (1000 * 8); ++k)
 		byteToSymbols(0x7E, false);
 
 	// Data
@@ -208,14 +212,16 @@ void encoder_af1200stj::send(frame_ptr fp) {
 	// CRC
 	int crc = calc_crc_ccitt(buffer.data(), buffer.size());
 
-	byteToSymbols((crc & 0xFF) ^ 0xFF, true);
-	byteToSymbols(((crc >> 8) & 0xFF) ^ 0xFF, true);
+	byteToSymbols((crc & 0xFF), true);
+	byteToSymbols(((crc >> 8) & 0xFF), true);
 
 	if (config::Instance()->debug()) {
-		std::vector<unsigned char> qqq(buffer);
-		qqq.push_back((crc & 0xFF)^0xff);
-		qqq.push_back(((crc >> 8) & 0xFF)^0xff);
-		std::cout << "QQQ bufsize " << buffer.size() << " - crcqqq " << calc_crc_ccitt(qqq.data(), qqq.size()) << " - crc " << crc << " - crcok " << 0xF0B8 << std::endl;
+		std::vector<unsigned char> qqq(buffer.begin(), buffer.end());
+
+		qqq.push_back((crc & 0xFF));
+		qqq.push_back(((crc >> 8) & 0xFF));
+
+		std::cout << "QQQ bufsize " << qqq.size() << " - check_crc_ccitt=" << check_crc_ccitt(qqq.data(), qqq.size()) << " - crc=" << crc << " - crcok=" << 0xF0B8 << std::endl;
 
 		for (k = 0; k < qqq.size(); ++k) {
 			std::printf("%02x ", qqq[k]);
@@ -224,7 +230,7 @@ void encoder_af1200stj::send(frame_ptr fp) {
 	}
 
 	// Tail
-	for (k = out->size(); ((out->size() - k) * 1000) / sample_rate_ < tx_tail; )
+	for (k = 0; k < (tx_tail * 1200) / (1000 * 8); ++k)
 		byteToSymbols(0x7E, false);
 
 	boost::lock_guard<boost::mutex> guard_(out_queue_mutex_);

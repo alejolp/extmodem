@@ -50,7 +50,7 @@ void config::init(int argc, char** argv) {
 	    ("help,h", "produce help message")
 	    ("debug,d", "produce debug messages")
 	    ("config-file", po::value<std::string>(), "configuration file name")
-	    ("audio-backend", po::value<std::string>(&audio_backend_)->default_value("portaudio"), "Audio backend: portaudio,alsa")
+	    ("audio-backend", po::value<std::string>(&audio_backend_)->default_value("portaudio"), "Audio backend: portaudio,alsa,loopback,null")
 	    ("kiss-tcp-port", po::value<int>(&kiss_tcp_port_)->default_value(6666), "set KISS TCP listening port")
 	    ("agwpe-tcp-port", po::value<int>(&agwpe_tcp_port_)->default_value(8000), "set AGWPE emulator TCP listening port")
 	    ("ptt-mode", po::value<std::string>(&ptt_mode_)->default_value("serial"), "PTT mode: serial,parallel,gpio,hamlib,null")
