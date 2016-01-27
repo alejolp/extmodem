@@ -19,12 +19,13 @@
  */
 
 #include <iostream>
+#include <cmath>
 
 #include "audiosource.h"
 #include "decoder.h"
 #include "encoder.h"
-
 #include "extmodem.h"
+#include "extconfig.h"
 
 namespace extmodem {
 
@@ -51,10 +52,17 @@ void modem::set_encoder(encoder_ptr p) {
 
 
 void modem::input_callback(audiosource* a, const float* buffer, unsigned long length) {
+	config* cfg = config::Instance();
 	unsigned int channel_count = (unsigned int) a->get_in_channel_count();
 	unsigned long ch_idx, k, p, deco_idx;
+	float mult_factor = cfg->audio_mult_factor();
+	int enabled_channels = cfg->enabled_channels();
 
-	if (channel_count == 1) {
+	if (enabled_channels == -1) {
+		enabled_channels = (1 << channel_count) - 1;
+	}
+
+	if (channel_count == 1 && (enabled_channels & 1) && std::abs(mult_factor - 1.0f) < 0.0001f) {
 		/* fast path, do not make a copy */
 		for (deco_idx = 0; deco_idx < decoders_[0].size(); ++deco_idx) {
 			decoders_[0][deco_idx]->input_callback(a, buffer, length);
@@ -66,13 +74,15 @@ void modem::input_callback(audiosource* a, const float* buffer, unsigned long le
 		tmpdata.resize(length);
 
 		for (ch_idx = 0; ch_idx < channel_count; ++ch_idx) {
-			/* Copy each channel data contiguously */
-			for (k = 0, p = ch_idx; p < length; ++k, p += channel_count) {
-				tmpdata[k] = buffer[p];
-			}
+			if (enabled_channels & (1 << ch_idx)) {
+				/* Copy each channel data contiguously */
+				for (k = 0, p = ch_idx; p < length; ++k, p += channel_count) {
+					tmpdata[k] = buffer[p] * mult_factor;
+				}
 
-			for (deco_idx = 0; deco_idx < decoders_[ch_idx].size(); ++deco_idx) {
-				decoders_[ch_idx][deco_idx]->input_callback(a, tmpdata.data(), k);
+				for (deco_idx = 0; deco_idx < decoders_[ch_idx].size(); ++deco_idx) {
+					decoders_[ch_idx][deco_idx]->input_callback(a, tmpdata.data(), k);
+				}
 			}
 		}
 	}

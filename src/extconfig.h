@@ -61,6 +61,8 @@ public:
 	std::string alsa_device() const { return alsa_device_; }
 	int frames_per_buff() const { return frames_per_buff_; }
 	int hamlib_model() const { return hamlib_model_; }
+	float audio_mult_factor() const { return audio_mult_factor_; }
+	int enabled_channels() const { return enabled_channels_; }
 
 private:
 	po::options_description desc;
@@ -81,6 +83,8 @@ private:
 	std::string alsa_device_;
 	int frames_per_buff_;
 	int hamlib_model_;
+	float audio_mult_factor_;
+	int enabled_channels_;
 };
 
 } /* namespace extmodem */
