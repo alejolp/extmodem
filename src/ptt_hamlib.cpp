@@ -23,6 +23,7 @@
 #include <string>
 #include <cstring>
 #include <cmath>
+#include <iostream>
 
 #include "ptt_hamlib.h"
 #include "extconfig.h"
