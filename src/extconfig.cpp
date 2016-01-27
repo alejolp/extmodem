@@ -63,6 +63,8 @@ void config::init(int argc, char** argv) {
 	    ("alsa-device", po::value<std::string>(&alsa_device_)->default_value("default"), "ALSA device string")
 	    ("frames-per-buffer", po::value<int>(&frames_per_buff_)->default_value(8192), "frames per buffer, bigger increases latency")
 		("hamlib-model", po::value<int>(&hamlib_model_)->default_value(-1), "hamlib Rig Model, -1 for auto detection")
+		("audio-mult-factor", po::value<float>(&audio_mult_factor_)->default_value(1.0f), "Audio multiplication factor as float")
+		("enabled-channels", po::value<int>(&enabled_channels_)->default_value(-1), "Enabled channels as a bitfield (1: left, 2: right, 3: both), -1 for all")
 	;
 
 	p_.add("config-file", -1);
