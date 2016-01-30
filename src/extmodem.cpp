@@ -19,6 +19,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 
 #include "audiosource.h"
@@ -29,7 +30,49 @@
 
 namespace extmodem {
 
+agc::agc() : min_(0), max_(0), sigma1_(0), samples_history_(0), p_(0) {
+	
+}
+
+agc::~agc() {
+
+}
+
+void agc::init(size_t samples_history) {
+	samples_history_ = samples_history;
+	history_.resize(samples_history);
+}
+
+void agc::sample(float f) {
+	history_[p_] = f;
+	p_ = (p_ + 1) % samples_history_;
+}
+
+void agc::update() {
+	if (history_.size() > 1) {
+		size_t i;
+
+		sum_ = sigma1_ = 0.0f;
+		min_ = max_ = history_[0];
+
+		for (i=0; i < history_.size(); ++i) {
+			if (history_[i] < min_) min_ = history_[i];
+			if (history_[i] > max_) max_ = history_[i];
+			sum_ += history_[i];
+		}
+
+		float avg2 = avg();
+
+		for (i=0; i < history_.size(); ++i) {
+			sigma1_ += (history_[i] - avg2) * (history_[i] - avg2);
+		}
+
+		sigma1_ /= history_.size() - 1;
+	}
+}
+
 modem::modem() : tcpserver_(this) {
+
 }
 
 modem::~modem() {
@@ -38,6 +81,11 @@ modem::~modem() {
 void modem::set_audiosource(audiosource_ptr p) {
 	audio_source_ = p;
 	decoders_.resize(p->get_in_channel_count());
+	agcs_.resize(p->get_in_channel_count());
+
+	for (unsigned i = 0; i < agcs_.size(); ++i) {
+		agcs_[i].init(8192); /* FIXME */
+	}
 }
 
 void modem::add_decoder(decoder_ptr p, int ch_num) {
@@ -78,6 +126,21 @@ void modem::input_callback(audiosource* a, const float* buffer, unsigned long le
 				/* Copy each channel data contiguously */
 				for (k = 0, p = ch_idx; p < length; ++k, p += channel_count) {
 					tmpdata[k] = buffer[p] * mult_factor;
+
+					agcs_[ch_idx].sample(tmpdata[k]);
+				}
+
+				agcs_[ch_idx].update();
+
+				if (cfg->debugaudio()) {
+					std::cout << "stats ch=" << ch_idx 
+						<< " avg=" << std::setprecision(6) << agcs_[ch_idx].avg() 
+						<< " min=" << std::setprecision(6) << agcs_[ch_idx].min_ 
+						<< " max=" << std::setprecision(6) << agcs_[ch_idx].max_ 
+						<< " diffminmax=" << std::setprecision(6) << (agcs_[ch_idx].max_ - agcs_[ch_idx].min_)
+						<< " sigma=" << std::setprecision(6) << agcs_[ch_idx].sigma() 
+						<< " stddev=" << std::setprecision(6) << agcs_[ch_idx].stddev()
+						<< std::endl;
 				}
 
 				for (deco_idx = 0; deco_idx < decoders_[ch_idx].size(); ++deco_idx) {
@@ -104,7 +167,14 @@ void modem::start_and_run() {
 }
 
 void modem::dispatch_packet(frame_ptr fp) {
-	tcpserver_.write_to_all_safe(fp);
+	if (fp->get_crc() != last_packet_crc_) {
+		last_packet_crc_ = fp->get_crc();
+		tcpserver_.write_to_all_safe(fp);
+
+		if (!config::Instance()->debug()) {
+			fp->print("INFO");
+		}
+	}
 }
 
 void modem::output_packet_to_sc(frame_ptr fp) {

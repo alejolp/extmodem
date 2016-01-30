@@ -32,6 +32,7 @@
 #include "hdlc.h"
 #include "multimon_utils.h"
 #include "extmodem.h"
+#include "extconfig.h"
 
 
 namespace extmodem {
@@ -122,9 +123,6 @@ void hdlc::rxbit(int bit) {
 	hdlc_.rxbitbuf >>= 1;
 }
 
-static uint16_t prev_crc = 0;
-  // It is important that this is static (shared between instances of this class)
-
 void hdlc::ax25_dispatch_packet(unsigned char *bp, unsigned int len) {
 
 	if (!check_crc_ccitt(bp, len))
@@ -134,15 +132,12 @@ void hdlc::ax25_dispatch_packet(unsigned char *bp, unsigned int len) {
 	frame_ptr new_frame(new frame(bp, len - 2));
 
 	// ax25_print_packet(new_frame, len - 2, name_.c_str(), 0);
-	new_frame->print(name_.c_str());
+	
+	if (config::Instance()->debug()) {
+		new_frame->print(name_.c_str());
+	}
 
-        uint16_t crc = *((uint16_t*)(bp+len-2));
-
-        if (crc != prev_crc)
-           em_->dispatch_packet(new_frame);
-        
-        prev_crc = crc;
-          // FIXME: Is access to this variable thread safe???
+	em_->dispatch_packet(new_frame);
 }
 
 int check_crc_ccitt(const unsigned char *buf, int cnt) {

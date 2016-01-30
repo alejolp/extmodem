@@ -42,7 +42,7 @@ void frame::print() {
 }
 
 void frame::print(const char* name) {
-        ax25_print_packet(data_.data(), data_.size(), name, 0);
+    ax25_print_packet(data_.data(), data_.size(), name, 0);
 }
 
 

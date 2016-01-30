@@ -49,8 +49,9 @@ void config::init(int argc, char** argv) {
 	desc.add_options()
 	    ("help,h", "produce help message")
 	    ("debug,d", "produce debug messages")
+	    ("debugaudio,a", "produce audio debug information")
 	    ("config-file", po::value<std::string>(), "configuration file name")
-	    ("audio-backend", po::value<std::string>(&audio_backend_)->default_value("portaudio"), "Audio backend: portaudio,alsa,loopback,null")
+	    ("audio-backend", po::value<std::string>(&audio_backend_)->default_value("portaudio"), "Audio backend: alsa,loopback,portaudio,wave,null")
 	    ("kiss-tcp-port", po::value<int>(&kiss_tcp_port_)->default_value(6666), "set KISS TCP listening port")
 	    ("agwpe-tcp-port", po::value<int>(&agwpe_tcp_port_)->default_value(8000), "set AGWPE emulator TCP listening port")
 	    ("ptt-mode", po::value<std::string>(&ptt_mode_)->default_value("serial"), "PTT mode: serial,parallel,gpio,hamlib,null")
@@ -64,7 +65,8 @@ void config::init(int argc, char** argv) {
 	    ("frames-per-buffer", po::value<int>(&frames_per_buff_)->default_value(8192), "frames per buffer, bigger increases latency")
 		("hamlib-model", po::value<int>(&hamlib_model_)->default_value(-1), "hamlib Rig Model, -1 for auto detection")
 		("audio-mult-factor", po::value<float>(&audio_mult_factor_)->default_value(1.0f), "Audio multiplication factor as float")
-		("enabled-channels", po::value<int>(&enabled_channels_)->default_value(-1), "Enabled channels as a bitfield (1: left, 2: right, 3: both), -1 for all")
+		("enabled-in-channels", po::value<int>(&enabled_channels_)->default_value(-1), "Enabled input channels as a bitfield (1: left, 2: right, 3: both), -1 for all")
+		("backend-wave-in-file", po::value<std::string>(&wave_file_in_)->default_value(""), "Backend WAVE: input file")
 	;
 
 	p_.add("config-file", -1);
@@ -83,6 +85,7 @@ void config::init(int argc, char** argv) {
 	}
 
 	debug_ = (vm.count("debug") > 0);
+	debugaudio_ = (vm.count("debugaudio") > 0);
 }
 
 

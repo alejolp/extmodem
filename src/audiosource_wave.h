@@ -18,53 +18,27 @@
  *      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef FRAME_H_
-#define FRAME_H_
 
-#include <vector>
-#include <cstdlib>
-#include <boost/smart_ptr.hpp>
+#ifndef AUDIOSOURCE_WAVE_H_
+#define AUDIOSOURCE_WAVE_H_
 
+#include <boost/thread.hpp>
+
+#include "audiosource.h"
 
 namespace extmodem {
 
-class frame;
-typedef boost::shared_ptr<frame> frame_ptr;
-
-class frame {
+class audiosource_wave : public audiosource {
 public:
-	/** Construct a new empty frame.
-	 *
-	 */
-	explicit frame() : crc_(0) {};
+    explicit audiosource_wave(int sample_rate);
+    virtual ~audiosource_wave();
 
-	/**  Constructs a new frame without the CRC at the end of the buffer.
-	 *
-	 * @param buffer
-	 * @param length
-	 */
-	explicit frame(const unsigned char* buffer, std::size_t length);
-
-	/**  Constructs a new frame without the CRC at the end of the buffer.
-	 *
-	 * @param buffer
-	 * @param length
-	 * @param crc
-	 */
-	explicit frame(const unsigned char* buffer, std::size_t length, unsigned int crc);
-
-	virtual ~frame();
-
-	std::vector<unsigned char>& get_data() { return data_; }
-	unsigned int get_crc() const { return crc_; }
-
-	void print();
-	void print(const char* name);
+    virtual void loop_async();
 
 private:
-	std::vector<unsigned char> data_;
-	unsigned int crc_;
+    void loop_async_thread_proc();
+    boost::thread thread_;
 };
 
 } /* namespace extmodem */
-#endif /* FRAME_H_ */
+#endif /* AUDIOSOURCE_WAVE_H_ */

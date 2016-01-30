@@ -41,6 +41,35 @@ typedef boost::shared_ptr<encoder> encoder_ptr;
 //class audiosource;
 typedef boost::shared_ptr<audiosource> audiosource_ptr;
 
+class agc {
+public:
+	agc();
+	virtual ~agc();
+
+	void init(size_t samples_history);
+	void sample(float f);
+	void update();
+
+	/* average value */
+	inline float avg() const { return sum_ / samples_history_; }
+
+	/* variance */
+	inline float sigma() const { return sigma1_; }
+
+	/* standard deviation */
+	inline float stddev() const { return (sigma() > 0) ? std::sqrt(sigma()) : 0; }
+
+	float sum_;
+	float min_;
+	float max_;
+	float sigma1_;
+
+private:
+	size_t samples_history_;
+	size_t p_;
+	std::vector<float> history_;
+};
+
 class modem : public audiosourcelistener {
 public:
 	modem();
@@ -80,7 +109,9 @@ private:
 
 private:
 	std::vector<float> tmpdata;
+	std::vector<agc> agcs_;
 	tcpserver tcpserver_;
+	unsigned int last_packet_crc_{0};
 };
 
 } /* namespace extmodem */

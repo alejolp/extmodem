@@ -23,6 +23,7 @@
 #include "audiosource_alsa.h"
 #include "audiosource_null.h"
 #include "audiosource_loopback.h"
+#include "audiosource_wave.h"
 #include "extmodem.h"
 #include "extconfig.h"
 
@@ -55,6 +56,8 @@ int main(int argc, char **argv) {
 		as.reset(new audiosource_null(cfg->sample_rate()));
 	} else if (cfg->audio_backend() == "loopback") {
 		as.reset(new audiosource_loopback(cfg->sample_rate()));
+	} else if (cfg->audio_backend() == "wave") {
+		as.reset(new audiosource_wave(cfg->sample_rate()));
 	} else if (cfg->audio_backend() == "portaudio") {
 #ifdef PORTAUDIO_FOUND
 		as.reset(new audiosource_portaudio(cfg->sample_rate()));

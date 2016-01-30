@@ -28,8 +28,10 @@ Open a new terminal (Start-Execute-"cmd" on windows) and ask for the program's h
     Allowed options:
       -h [ --help ]                     produce help message
       -d [ --debug ]                    produce debug messages
+      -a [ --debugaudio ]               produce audio debug information
       --config-file arg                 configuration file name
-      --audio-backend arg (=portaudio)  Audio backend: portaudio,alsa
+      --audio-backend arg (=portaudio)  Audio backend: alsa,loopback,portaudio,wave
+                                        ,null
       --kiss-tcp-port arg (=6666)       set KISS TCP listening port
       --agwpe-tcp-port arg (=8000)      set AGWPE emulator TCP listening port
       --ptt-mode arg (=serial)          PTT mode: serial,parallel,gpio,hamlib,null
@@ -42,6 +44,11 @@ Open a new terminal (Start-Execute-"cmd" on windows) and ask for the program's h
       --alsa-device arg (=default)      ALSA device string
       --frames-per-buffer arg (=8192)   frames per buffer, bigger increases latency
       --hamlib-model arg (=-1)          hamlib Rig Model, -1 for auto detection
+      --audio-mult-factor arg (=1)      Audio multiplication factor as float
+      --enabled-in-channels arg (=-1)   Enabled input channels as a bitfield (1: 
+                                        left, 2: right, 3: both), -1 for all
+      --backend-wave-in-file arg        Backend WAVE: input file
+
 
 You should at least set the PTT Port, Usually COMx on Windows and /dev/ttySX on Linux and Unix.
 
@@ -117,7 +124,7 @@ Then just type, at the "extmodem" directory:
 
     mkdir build
     cd build
-    CFLAGS=-O2 CXXFLAGS=-O2 cmake ..
+    cmake .. -DCMAKE_BUILD_TYPE=Release
     make -j4
 
 The executable should be at  `build/extmodem`

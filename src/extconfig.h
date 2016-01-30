@@ -63,6 +63,8 @@ public:
 	int hamlib_model() const { return hamlib_model_; }
 	float audio_mult_factor() const { return audio_mult_factor_; }
 	int enabled_channels() const { return enabled_channels_; }
+	std::string wave_file_in() const { return wave_file_in_; }
+	bool debugaudio() const { return debugaudio_; }
 
 private:
 	po::options_description desc;
@@ -85,6 +87,9 @@ private:
 	int hamlib_model_;
 	float audio_mult_factor_;
 	int enabled_channels_;
+	std::string wave_file_in_;
+	bool debugaudio_;
+	
 };
 
 } /* namespace extmodem */
