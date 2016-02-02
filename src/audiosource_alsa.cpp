@@ -156,6 +156,9 @@ void audiosource_alsa::loop_async_thread_rec() {
 
 	for (;;) {
 		if (restart) {
+			if (cfg->debug()) {
+				std::cerr << "ALSA restart" << std::endl;
+			}
 			restart = false;
 			snd_pcm_drop(c_handle_);
 			snd_pcm_prepare(c_handle_);
@@ -165,9 +168,17 @@ void audiosource_alsa::loop_async_thread_rec() {
 		for (;;) {
 			frames = snd_pcm_readi(c_handle_, buffer.data(), buffer.size());
 			if (frames == -EAGAIN) {
+				if (cfg->debug()) {
+					std::cerr << "ALSA EAGAIN" << std::endl;
+				}
 				continue;
 			} else {
-				if (frames < 0) restart = true;
+				if (frames < 0) {
+					if (cfg->debug()) {
+						std::cerr << "ALSA snd_pcm_readi < 0 = " << frames << std::endl;
+					}
+					restart = true;
+				}
 				break;
 			}
 		}
@@ -210,6 +221,9 @@ void audiosource_alsa::loop_async_thread_play() {
 
 	for (;;) {
 		if (restart) {
+			if (cfg->debug()) {
+				std::cerr << "ALSA restart" << std::endl;
+			}
 			restart = false;
 			snd_pcm_drop(c_handle_);
 			snd_pcm_prepare(c_handle_);
@@ -231,9 +245,17 @@ void audiosource_alsa::loop_async_thread_play() {
 		for (;;) {
 			frames = snd_pcm_writei(p_handle_, buffer.data(), buffer.size());
 			if (frames == -EAGAIN) {
+				if (cfg->debug()) {
+					std::cerr << "ALSA EAGAIN" << std::endl;
+				}
 				continue;
 			} else {
-				if (frames < 0) restart = true;
+				if (frames < 0) {
+					if (cfg->debug()) {
+						std::cerr << "ALSA snd_pcm_readi < 0 = " << frames << std::endl;
+					}
+					restart = true;
+				}
 				break;
 			}
 		}
