@@ -18,45 +18,45 @@
 #include "audiosource_alsa.h"
 #include "extconfig.h"
 
-namespace extmodem {
+ namespace extmodem {
 
-audiosource_alsa::audiosource_alsa(int sample_rate) : audiosource(sample_rate), p_handle_(0), c_handle_(0) {
-	init();
-}
+ 	audiosource_alsa::audiosource_alsa(int sample_rate) : audiosource(sample_rate), p_handle_(0), c_handle_(0) {
+ 		init();
+ 	}
 
-audiosource_alsa::~audiosource_alsa() {
-	close();
-}
+ 	audiosource_alsa::~audiosource_alsa() {
+ 		close();
+ 	}
 
-void audiosource_alsa::init() {
-    int err;
-    std::string device = config::Instance()->alsa_device();
+ 	void audiosource_alsa::init() {
+ 		int err;
+ 		std::string device = config::Instance()->alsa_device();
 
-	if ((err = snd_pcm_open(&p_handle_, device.c_str(), SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
-		std::cerr << "snd_pcm_open playback error: " << snd_strerror(err) << std::endl;
-		close();
-		throw audiosourceexception("snd_pcm_open");
-	}
+ 		if ((err = snd_pcm_open(&p_handle_, device.c_str(), SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
+ 			std::cerr << "snd_pcm_open playback error: " << snd_strerror(err) << std::endl;
+ 			close();
+ 			throw audiosourceexception("snd_pcm_open");
+ 		}
 
-	if ((err = snd_pcm_set_params(p_handle_,
-			SND_PCM_FORMAT_S16,
-			SND_PCM_ACCESS_RW_INTERLEAVED,
-			get_out_channel_count(),
-			get_sample_rate(),
+ 		if ((err = snd_pcm_set_params(p_handle_,
+ 			SND_PCM_FORMAT_S16,
+ 			SND_PCM_ACCESS_RW_INTERLEAVED,
+ 			get_out_channel_count(),
+ 			get_sample_rate(),
 			1, /* FIXME: resample? */
 			500000)) < 0) { /* 0.5sec */
-		std::cerr << "snd_pcm_set_params playback error: " << snd_strerror(err) << " ch:" << get_out_channel_count() << " rate: " << get_sample_rate() << std::endl;
-		close();
-		throw audiosourceexception("snd_pcm_set_params");
-	}
+ 			std::cerr << "snd_pcm_set_params playback error: " << snd_strerror(err) << " ch:" << get_out_channel_count() << " rate: " << get_sample_rate() << std::endl;
+ 			close();
+ 			throw audiosourceexception("snd_pcm_set_params");
+ 		}
 
-	snd_pcm_hw_params_t *hw_params;
+ 		snd_pcm_hw_params_t *hw_params;
 
-	if ((err = snd_pcm_open(&c_handle_, device.c_str(), SND_PCM_STREAM_CAPTURE, 0)) < 0) {
-		std::cerr << "snd_pcm_open capture error: " << snd_strerror(err) << std::endl;
-		close();
-		throw audiosourceexception("snd_pcm_open");
-	}
+ 		if ((err = snd_pcm_open(&c_handle_, device.c_str(), SND_PCM_STREAM_CAPTURE, 0)) < 0) {
+ 			std::cerr << "snd_pcm_open capture error: " << snd_strerror(err) << std::endl;
+ 			close();
+ 			throw audiosourceexception("snd_pcm_open");
+ 		}
 
 #if 0
 	if ((err = snd_pcm_set_params(c_handle_,
@@ -130,16 +130,18 @@ void audiosource_alsa::close() {
 }
 
 void audiosource_alsa::loop_async() {
-	thread_ = boost::thread(boost::bind(&audiosource_alsa::loop_async_thread_proc, this));
+	thread_play_ = boost::thread(boost::bind(&audiosource_alsa::loop_async_thread_play, this));
+	thread_rec_ = boost::thread(boost::bind(&audiosource_alsa::loop_async_thread_rec, this));
 }
 
-void audiosource_alsa::loop_async_thread_proc() {
+void audiosource_alsa::loop_async_thread_rec() {
 	config* cfg = config::Instance();
 	std::vector<short> buffer;
 	std::vector<float> bufferf;
 	snd_pcm_sframes_t frames;
 	int ret;
 	int buf_size = (cfg->frames_per_buff() > 0) ? cfg->frames_per_buff() : (get_sample_rate());
+	bool restart = true;
 
 	buffer.resize(buf_size);
 	bufferf.resize(buf_size);
@@ -150,63 +152,101 @@ void audiosource_alsa::loop_async_thread_proc() {
 		return;
 	}
 
+	/* FIXME Break the loop */
+
+	for (;;) {
+		if (restart) {
+			restart = false;
+			snd_pcm_drop(c_handle_);
+			snd_pcm_prepare(c_handle_);
+		}
+
+		/* Read data from the soundcard */
+		for (;;) {
+			frames = snd_pcm_readi(c_handle_, buffer.data(), buffer.size());
+			if (frames == -EAGAIN) {
+				continue;
+			} else {
+				if (frames < 0) restart = true;
+				break;
+			}
+		}
+
+		if (restart) {
+			continue;
+		}
+
+		if (cfg->debug() && frames != (snd_pcm_sframes_t)buffer.size()) {
+			std::cerr << "ALSA short read, expected " << buffer.size() << " wrote " << frames << std::endl;
+		}
+
+		for (int i = 0; i < frames; ++i) {
+			bufferf[i] = buffer[i] * 1.0 / 32768.0f;
+		}
+
+		get_listener()->input_callback(this, bufferf.data(), frames);
+	}
+}
+
+void audiosource_alsa::loop_async_thread_play() {
+	config* cfg = config::Instance();
+	std::vector<short> buffer;
+	std::vector<float> bufferf;
+	snd_pcm_sframes_t frames;
+	int ret;
+	int buf_size = (cfg->frames_per_buff() > 0) ? cfg->frames_per_buff() : (get_sample_rate());
+	bool restart = true;
+
+	buffer.resize(buf_size);
+	bufferf.resize(buf_size);
+
 	if ((ret = snd_pcm_prepare(p_handle_)) < 0) {
 		std::cerr << "snd_pcm_prepare playback error: " << snd_strerror(ret) << std::endl;
 		close();
 		return;
 	}
 
+	/* FIXME Break the loop */
+
 	for (;;) {
-		/* Read data from the soundcard */
-		frames = snd_pcm_readi(c_handle_, buffer.data(), buffer.size());
-
-		if (frames == -EPIPE) {
-			if (cfg->debug())
-				std::cerr << "snd_pcm_readi EPIPE OVERRUN error: " << snd_strerror(frames) << std::endl;
+		if (restart) {
+			restart = false;
+			snd_pcm_drop(c_handle_);
 			snd_pcm_prepare(c_handle_);
-			frames = 0;
-		} else if (frames < 0) {
-			frames = snd_pcm_recover(c_handle_, frames, 0);
 		}
 
-		if (frames < 0) {
-			if (cfg->debug())
-				std::cerr << "snd_pcm_readi error: " << snd_strerror(frames) << std::endl;
+		/*
+		for (size_t i = 0 ; i < bufferf.size(); ++i) {
+			bufferf[i] = 0;
 		}
+		*/
 
-		if (frames > 0 && get_listener()) {
-			for (int i = 0; i < frames; ++i) {
-				bufferf[i] = buffer[i] * 1.0 / 32768.0f;
-			}
-			get_listener()->input_callback(this, bufferf.data(), frames);
-		}
-
-		if (get_listener()) {
-			for (size_t i = 0 ; i < bufferf.size(); ++i) {
-				bufferf[i] = 0;
-			}
-			/* Write data to the soundcard */
-			get_listener()->output_callback(this, bufferf.data(), bufferf.size());
-		}
+		/* Write data to the soundcard */
+		get_listener()->output_callback(this, bufferf.data(), bufferf.size());
 
 		for (size_t i = 0 ; i < bufferf.size(); ++i) {
 			buffer[i] = static_cast<short>( bufferf[i] * 32767 );
 		}
 
-        frames = snd_pcm_writei(p_handle_, buffer.data(), buffer.size());
-        if (frames < 0) {
-        	if (cfg->debug())
-    			std::cerr << "snd_pcm_writei error: " << snd_strerror(frames) << " RECOVER..." << std::endl;
-			frames = snd_pcm_recover(p_handle_, frames, 0);
-        }
-        if (frames < 0) {
-        	if (cfg->debug())
-    			std::cerr << "snd_pcm_writei error: " << snd_strerror(frames) << std::endl;
-        }
-        if (frames < (snd_pcm_sframes_t)buffer.size()) {
-        	if (cfg->debug())
-        		std::cerr << "ALSA short write, expected " << buffer.size() << " wrote " << frames << std::endl;
-        }
+		for (;;) {
+			frames = snd_pcm_writei(p_handle_, buffer.data(), buffer.size());
+			if (frames == -EAGAIN) {
+				continue;
+			} else {
+				if (frames < 0) restart = true;
+				break;
+			}
+		}
+
+		if (restart) {
+			continue;
+		}
+
+		if (frames != (snd_pcm_sframes_t)buffer.size()) {
+			if (cfg->debug()) {
+				std::cerr << "ALSA short write, expected " << buffer.size() << " wrote " << frames << std::endl;
+			}
+		}
 	}
 
 	close();

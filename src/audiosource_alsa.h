@@ -27,7 +27,8 @@ public:
 
 private:
 
-	void loop_async_thread_proc();
+	void loop_async_thread_play();
+	void loop_async_thread_rec();
 
 	void init();
 	void close();
@@ -35,7 +36,8 @@ private:
 private:
 	snd_pcm_t *p_handle_;
 	snd_pcm_t *c_handle_;
-	boost::thread thread_;
+	boost::thread thread_play_;
+	boost::thread thread_rec_;
 };
 
 } /* namespace extmodem */
