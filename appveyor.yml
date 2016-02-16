@@ -13,7 +13,7 @@ configuration:
   - Release
 
 environment:
-  globa:
+  global:
     BOOST_INCLUDEDIR: C:/Libraries/boost_1_59_0
     BUILD_TYPE: Release
     CMAKE_INCLUDE_PATH: C:/projects/extmodem/deps/portaudio/build/native/include
