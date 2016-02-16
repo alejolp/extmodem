@@ -34,7 +34,7 @@ init:
   - cmd: cmake --version
   - cmd: msbuild /version
   - cmd: echo %platform%
-  - ps: >-
+  - ps: |
     If ($env:Platform -Match "x64") {
       $env:BOOST_LIBRARYDIR="C:/Libraries/boost_1_59_0/lib64-msvc-14.0"
       $env:CMAKE_GENERATOR="Visual Studio 14 2015 Win64"
