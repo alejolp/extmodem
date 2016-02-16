@@ -110,7 +110,7 @@ void modem::input_callback(audiosource* a, const float* buffer, unsigned long le
 		enabled_channels = (1 << channel_count) - 1;
 	}
 
-	if (channel_count == 1 && (enabled_channels & 1) && std::abs(mult_factor - 1.0f) < 0.0001f) {
+	if (!(cfg->debugaudio()) && channel_count == 1 && (enabled_channels & 1) && std::abs(mult_factor - 1.0f) < 0.0001f) {
 		/* fast path, do not make a copy */
 		for (deco_idx = 0; deco_idx < decoders_[0].size(); ++deco_idx) {
 			decoders_[0][deco_idx]->input_callback(a, buffer, length);
