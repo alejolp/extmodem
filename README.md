@@ -16,7 +16,7 @@ Since the core of the extmodem runs the same algorithm as javAX25, the number of
 Windows Files
 -------------
 
-Windows 64-bit binaries can be found at: http://files.dakaraonline.org/extmodem/
+Windows 32-bit and 64-bit binaries can be found at: http://files.dakaraonline.org/extmodem/
 
 Usage
 -----
