@@ -77,6 +77,7 @@ after_build:
   - cp %BOOST_LIBRARYDIR%/boost_system-vc140-mt-1_59.dll %APPVEYOR_BUILD_FOLDER%/build/Release/
   - cp %BOOST_LIBRARYDIR%/boost_thread-vc140-mt-1_59.dll %APPVEYOR_BUILD_FOLDER%/build/Release/
   - cp %BOOST_LIBRARYDIR%/boost_date_time-vc140-mt-1_59.dll %APPVEYOR_BUILD_FOLDER%/build/Release/
+  - cp %BOOST_LIBRARYDIR%/boost_chrono-vc140-mt-1_59.dll %APPVEYOR_BUILD_FOLDER%/build/Release/
   - 7z a -mx=9 -xr!.git -xr!extmodem.dir -xr!*.ilk -xr!*.pdb -xr!*.nupkg -xr!deps %EXTMODEM_ARTIFACT% %APPVEYOR_BUILD_FOLDER%
   - appveyor PushArtifact %EXTMODEM_ARTIFACT%
 
