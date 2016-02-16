@@ -34,13 +34,6 @@ init:
   - cmd: cmake --version
   - cmd: msbuild /version
   - cmd: echo %platform%
-  - ps: If ($env:Platform -Match "x64") {
-      $env:BOOST_LIBRARYDIR="C:/Libraries/boost_1_59_0/lib64-msvc-14.0"
-      $env:CMAKE_GENERATOR="Visual Studio 14 2015 Win64"
-    } Else {
-      $env:BOOST_LIBRARYDIR="C:/Libraries/boost_1_59_0/lib32-msvc-14.0"
-      $env:CMAKE_GENERATOR="Visual Studio 14 2015"
-    }
 
 before_build:
   - mkdir deps
@@ -52,6 +45,14 @@ build_script:
 #  - dir /s /p %BOOST_ROOT%
 #  - dir /s /p deps
   - echo %configuration%
+  - ps: If ($env:Platform -Match "x64") {
+      $env:BOOST_LIBRARYDIR="C:/Libraries/boost_1_59_0/lib64-msvc-14.0"
+      $env:CMAKE_GENERATOR="Visual Studio 14 2015 Win64"
+    } Else {
+      $env:BOOST_LIBRARYDIR="C:/Libraries/boost_1_59_0/lib32-msvc-14.0"
+      $env:CMAKE_GENERATOR="Visual Studio 14 2015"
+    }
+
   - mkdir build
   - pushd .
   - cd build
