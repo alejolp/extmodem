@@ -18,7 +18,7 @@ environment:
     BUILD_TYPE: Release
     CMAKE_INCLUDE_PATH: C:/projects/extmodem/deps/portaudio/build/native/include
     CMAKE_LIBRARY_PATH: C:/projects/extmodem/deps/portaudio/build/native/lib/%PLATFORM%/v120/Release
-    PORTAUDIO_DLL_PATH: C:/projects/extmodem/deps/portaudio.redist/build/native/bin/%PLATFORM%/v120/Release
+#    PORTAUDIO_DLL_PATH: C:/projects/extmodem/deps/portaudio.redist/build/native/bin/%PLATFORM%/v120/Release
     EXTMODEM_ARTIFACT: extmodem-%PLATFORM%-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_BUILD_NUMBER%-%APPVEYOR_JOB_ID%.zip
 
 #  matrix:
@@ -45,10 +45,12 @@ build_script:
 #  - dir /s /p %BOOST_ROOT%
 #  - dir /s /p deps
   - IF "%PLATFORM%" == "x86" ( SET BOOST_LIBRARYDIR=C:/Libraries/boost_1_59_0/lib32-msvc-14.0)
-  - IF "%PLATFORM%" == "x86" ( SET CMAKE_GENERATOR=Visual Studio 14 2015)
+  - IF "%PLATFORM%" == "x86" ( SET CMAKE_GENERATOR="Visual Studio 14 2015")
+  - IF "%PLATFORM%" == "x86" ( SET PORTAUDIO_DLL_PATH=C:/projects/extmodem/deps/portaudio.redist/build/native/bin/Win32/v120/Release)
 
   - IF "%PLATFORM%" == "x64" ( SET BOOST_LIBRARYDIR=C:/Libraries/boost_1_59_0/lib64-msvc-14.0)
-  - IF "%PLATFORM%" == "x64" ( SET CMAKE_GENERATOR=Visual Studio 14 2015 Win64)
+  - IF "%PLATFORM%" == "x64" ( SET CMAKE_GENERATOR="Visual Studio 14 2015 Win64")
+  - IF "%PLATFORM%" == "x64" ( SET PORTAUDIO_DLL_PATH=C:/projects/extmodem/deps/portaudio.redist/build/native/bin/x64/v120/Release)
 
   - echo %PLATFORM%
   - echo %BOOST_LIBRARYDIR%
@@ -60,7 +62,7 @@ build_script:
   - pushd .
   - cd build
   - cmake --version
-  - cmake -G "%CMAKE_GENERATOR%" ..
+  - cmake -G %CMAKE_GENERATOR% ..
   - cmake --build . --config Release
 
 build:

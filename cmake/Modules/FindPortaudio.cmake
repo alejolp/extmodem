@@ -20,7 +20,7 @@ find_path(PORTAUDIO_INCLUDE_DIRS
 
 find_library(PORTAUDIO_LIBRARIES
   NAMES
-    portaudio portaudio_x64 portaudio_x64.lib
+    portaudio portaudio_x64 portaudio_x64.lib portaudio_x86 portaudio_x86.lib 
   PATHS
       /usr/local/lib
       /usr/lib
