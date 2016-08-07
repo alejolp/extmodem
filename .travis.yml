@@ -5,7 +5,7 @@ compiler:
   - clang
   - gcc
 install:
-  - sudo apt-get install -y cmake build-essential g++ portaudio19-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev
+  - sudo apt-get install -y cmake build-essential g++ portaudio19-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev libhamlib-dev
 script:
   - mkdir build
   - cd build
