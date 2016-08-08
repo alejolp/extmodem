@@ -18,6 +18,7 @@
  *      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <iostream>
 
 #include "audiosource_portaudio.h"
 #include "audiosource_alsa.h"
