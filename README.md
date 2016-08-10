@@ -119,7 +119,7 @@ On Linux systems you can compile with g++ using cmake. You need:
 
 On Debian and Ubuntu you can install the required packages easily:
 
-    aptitude install cmake build-essential g++ portaudio19-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev libhamlib-dev
+    apt-get install cmake build-essential g++ portaudio19-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev libhamlib-dev
 
 Then just type, at the "extmodem" directory:
 
