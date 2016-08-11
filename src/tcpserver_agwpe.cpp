@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <regex>
 
 #include <boost/cstdint.hpp>
 #include <boost/static_assert.hpp>
@@ -152,6 +153,8 @@ EXTMODEM_VCPP_ALIGN(1) struct agwpe_tcp_frame {
 #define AGWPE_MIN_HEADER_SIZE (1+3+1+1+1+1+10+10+4+4)
 
 BOOST_STATIC_ASSERT(sizeof(((agwpe_tcp_frame*)(0))->header) == AGWPE_MIN_HEADER_SIZE);
+
+std::regex CALLSIGN_SSID_REGEXP("([^\\-]+)-?(\\d+)?");
 
 /** Decodes an AGWPE frame.
  *
@@ -456,6 +459,43 @@ void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_agwpe_frame) {
 	}
 	break;
 
+	case 'V': /* Send UNPROTO VIA (‘V’ frame) */
+	{
+		try {
+
+			// compose frame data with destination and source
+			new_agwpe_frame->data.raw_data[new_agwpe_frame->header.dataLen] = '\0';
+			int ndigi = new_agwpe_frame->data.raw_data[0];
+			std::stringstream ss;
+			ss << process_address(new_agwpe_frame->header.callTo, true, false);
+			ss << process_address(new_agwpe_frame->header.callFrom, true, ndigi == 0);
+
+			// add repeaters
+			char *p = new_agwpe_frame->data.raw_data + 1;
+			for (int k = 0; k < ndigi; k++) {
+
+				ss << process_address(p, false, k == ndigi-1);
+				p += 10;
+			}
+
+			// control field, protocol and information
+			ss << (char) 3 << (char) 0xF0;
+			ss << p;
+			std::string data = ss.str();
+
+			std::cout << "AGWPE New local frame (UNPROTO VIA)" << std::endl;
+			frame_ptr new_ax25_frame (new frame(reinterpret_cast<const unsigned char*>(data.c_str()), data.length()));
+			new_ax25_frame->print();
+
+			get_agwpe_server()->get_modem()->output_packet_to_sc(new_ax25_frame);
+
+		} catch (const std::invalid_argument& e) {
+
+			std::cerr << "AGWPE ERROR: " << e.what() << std::endl;
+		}
+	}
+	break;
+
 #if 0
 	case 'P': /* Application Login (‘P’ frame) */
 		break;
@@ -472,6 +512,36 @@ void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_agwpe_frame) {
 		std::cerr << "AGWPE UNHANDLED PACKET type: " << new_agwpe_frame->header.dataKind << std::endl;
 		break;
 	}
+}
+
+std::string agwpe_session::process_address(std::string callsign, bool flags_first_bit, bool flags_last_bit) {
+
+	std::smatch base_match;
+	if (std::regex_match(callsign, base_match, CALLSIGN_SSID_REGEXP)) {
+
+		// check SSID presence
+		int ssid = 0;
+		if (base_match.size() == 3 && !base_match[2].str().empty())
+			ssid = std::stoi(base_match[2].str());
+
+		// shift address bits
+		std::string out = std::string(7, ' ' << 1);
+		for (unsigned i=0; i<base_match[1].str().length(); ++i)
+			out.at(i) = base_match[1].str().at(i) << 1;
+
+		// last octet with SSID and flags
+		char octet = (char)ssid;
+		octet <<= 1;
+		octet ^= (-flags_first_bit ^ octet) & (1 << 7);
+		octet |= 1 << 6;
+		octet |= 1 << 5;
+		octet ^= (-flags_last_bit ^ octet) & (1 << 0);
+		out.at(6) = octet;
+
+		return out;
+
+	} else
+		throw std::invalid_argument("received wrong callsign '" + callsign + "'");
 }
 
 agwpe_server* agwpe_session::get_agwpe_server() {
