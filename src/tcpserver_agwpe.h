@@ -47,7 +47,6 @@ protected:
 
 private:
 	void handle_agwpe_frame(agwpe_tcp_frame_ptr new_frame);
-	std::string process_address(std::string callsign, bool flags_first_bit, bool flags_last_bit);
 	std::vector<unsigned char> inbuff_;
 	bool want_raw_frames_;
 };
