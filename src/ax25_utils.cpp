@@ -19,6 +19,7 @@
  */
 
 #include "ax25_utils.h"
+#include <algorithm>
 #include <sstream>
 
 namespace extmodem {
