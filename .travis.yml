@@ -10,9 +10,7 @@ install:
   - sudo apt-get install -y cmake build-essential g++ portaudio19-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev libhamlib-dev
 
 script:
-  - mkdir build
-  - cd build
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then cmake .. && cmake --build . ; fi
+  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then mkdir build && cd build && cmake .. && cmake --build . ; fi
 
 branches:
   only:
