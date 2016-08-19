@@ -1,13 +1,36 @@
 sudo: required
 dist: trusty
 language: cpp
+
 compiler:
   - clang
   - gcc
+
 install:
   - sudo apt-get install -y cmake build-essential g++ portaudio19-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev libhamlib-dev
+
 script:
   - mkdir build
   - cd build
-  - cmake .. && make
+  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then cmake .. && cmake --build . ; fi
 
+branches:
+  only:
+    - master
+    - coverity_scan
+
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "Ooc51yJO0Ds4nb0N0sRiOwuCVaAIMxUZVISF7Ibe9a0Ufs1KEjR80obOb+sYdQvtAS3QUCstswaxBplrMUifmVDO9M8zvgLICtKrqI31QDIBhtebaMTQVhbs+WxqzbFo0/Cqnd+10DvLdqxmHCguQeBq08/dMbYNzQzOj0IOB6Y="
+
+addons:
+  coverity_scan:
+    project:
+      name: "alejolp/extmodem"
+      description: "Build submitted via Travis CI"
+    notification_email: alejolp@gmail.com
+    build_command_prepend: "mkdir build; cd build; cmake .."
+    build_command:   "cmake --build ."
+    branch_pattern: coverity_scan

@@ -3,6 +3,8 @@
 
 [![Build Status](https://travis-ci.org/alejolp/extmodem.svg?branch=master)](https://travis-ci.org/alejolp/extmodem)
 
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/9834/badge.svg)](https://scan.coverity.com/projects/alejolp-extmodem)
+
 Sound card modem for Amateur Radio AX25
 =======================================
 
