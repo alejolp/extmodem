@@ -28,6 +28,7 @@
 #include "frame.h"
 #include "extmodem.h"
 #include "extconfig.h"
+#include "ax25_utils.h"
 
 #ifdef _MSC_VER
 #define EXTMODEM_VCPP_ALIGN(x) __declspec(align(x))
@@ -453,6 +454,32 @@ void agwpe_session::handle_agwpe_frame(agwpe_tcp_frame_ptr new_agwpe_frame) {
 	case 'k': /* Activate reception of Frames in “raw” format (‘k’ Frame) */
 	{
 		want_raw_frames_ = !want_raw_frames_;
+	}
+	break;
+
+	case 'V': /* Send UNPROTO VIA (‘V’ frame) */
+	{
+        // extract repeaters
+        new_agwpe_frame->data.raw_data[new_agwpe_frame->header.dataLen] = '\0';
+        int ndigi = new_agwpe_frame->data.raw_data[0];
+        std::vector<std::string> repeaters;
+        repeaters.reserve((unsigned long) ndigi);
+        char *p = new_agwpe_frame->data.raw_data + 1;
+        for (int k = 0; k < ndigi; k++) {
+
+            repeaters.push_back(p);
+            p += 10;
+        }
+
+        // compose frame data
+        std::string data = ax25_utils::encode_frame_data_repeater_mode(new_agwpe_frame->header.callFrom,
+                                                                       new_agwpe_frame->header.callTo, &repeaters, p);
+
+        std::cout << "AGWPE New local frame (UNPROTO VIA)" << std::endl;
+        frame_ptr new_ax25_frame (new frame(reinterpret_cast<const unsigned char*>(data.c_str()), data.length()));
+        new_ax25_frame->print();
+
+        get_agwpe_server()->get_modem()->output_packet_to_sc(new_ax25_frame);
 	}
 	break;
 

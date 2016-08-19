@@ -12,6 +12,7 @@ local.properties
 .classpath
 .settings/
 .loadpath
+.idea
 
 # vim backups
 *~
