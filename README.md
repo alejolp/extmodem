@@ -32,6 +32,7 @@ Open a new terminal (Start-Execute-"cmd" on windows) and ask for the program's h
       -h [ --help ]                     produce help message
       -d [ --debug ]                    produce debug messages
       -a [ --debugaudio ]               produce audio debug information
+      -L [ --list-devices ]             list audio source devices and exit
       --config-file arg                 configuration file name
       --audio-backend arg (=portaudio)  Audio backend: alsa,loopback,portaudio,wave
                                         ,null
@@ -51,6 +52,10 @@ Open a new terminal (Start-Execute-"cmd" on windows) and ask for the program's h
       --enabled-in-channels arg (=-1)   Enabled input channels as a bitfield (1: 
                                         left, 2: right, 3: both), -1 for all
       --backend-wave-in-file arg        Backend WAVE: input file
+      --pa-in-dev arg (=-1)             PortAudio input device id number. See 
+                                        --list-devices
+      --pa-out-dev arg (=-1)            PortAudio output device id number. See 
+                                        --list-devices
 
 
 You should at least set the PTT Port, Usually COMx on Windows and /dev/ttySX on Linux and Unix.
