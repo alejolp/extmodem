@@ -72,24 +72,23 @@ private:
 	po::positional_options_description p_;
 
 	std::string audio_backend_;
-	int kiss_tcp_port_;
-	int agwpe_tcp_port_;
+	int kiss_tcp_port_{};
+	int agwpe_tcp_port_{};
 	std::string ptt_port_;
 	std::string ptt_mode_;
-	int tx_delay_;
-	int tx_tail_;
-	bool debug_;
-	int sample_rate_;
-	int in_channels_count_;
-	int out_channels_count_;
+	int tx_delay_{};
+	int tx_tail_{};
+	bool debug_{};
+	int sample_rate_{};
+	int in_channels_count_{};
+	int out_channels_count_{};
 	std::string alsa_device_;
-	int frames_per_buff_;
-	int hamlib_model_;
-	float audio_mult_factor_;
-	int enabled_channels_;
+	int frames_per_buff_{};
+	int hamlib_model_{};
+	float audio_mult_factor_{};
+	int enabled_channels_{};
 	std::string wave_file_in_;
-	bool debugaudio_;
-	
+	bool debugaudio_{};
 };
 
 } /* namespace extmodem */

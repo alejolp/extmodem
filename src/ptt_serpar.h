@@ -35,7 +35,7 @@ namespace extmodem {
 #ifdef _MSC_VER
 class ptt_serial_windows: public ptt {
 public:
-	ptt_serial_windows() : hnd_(INVALID_HANDLE_VALUE) {}
+	ptt_serial_windows() : hnd_(INVALID_HANDLE_VALUE), state_(0) {}
 	virtual ~ptt_serial_windows();
 
 	virtual int init(const char* fname);
@@ -54,7 +54,7 @@ private:
 #ifdef __unix__
 class ptt_serial_unix: public ptt {
 public:
-	ptt_serial_unix() : fd_(-1) {}
+	ptt_serial_unix() : fd_(-1), state_(0) {}
 	virtual ~ptt_serial_unix();
 
 	virtual int init(const char* fname);
@@ -71,7 +71,7 @@ private:
 
 class ptt_parallel_unix: public ptt {
 public:
-	ptt_parallel_unix() : fd_(-1) {}
+	ptt_parallel_unix() : fd_(-1), state_(0) {}
 	virtual ~ptt_parallel_unix();
 
 	virtual int init(const char* fname);
@@ -85,7 +85,7 @@ private:
 
 class ptt_gpio_unix: public ptt {
 public: 
-        ptt_gpio_unix() {}
+        ptt_gpio_unix() : state_(0) {}
         virtual ~ptt_gpio_unix();
         
         virtual int init(const char* fname);
@@ -93,7 +93,7 @@ public:
         virtual int get_tx();
 private: 
         int state_;
-        char gpio_pin_[40];
+        std::string gpio_pin_;
 };
 
 

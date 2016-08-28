@@ -28,7 +28,7 @@ namespace extmodem {
 class agwpe_server;
 class modem;
 
-class agwpe_tcp_frame;
+struct agwpe_tcp_frame;
 typedef boost::shared_ptr<agwpe_tcp_frame> agwpe_tcp_frame_ptr;
 
 class agwpe_session : public basic_asio_session {

@@ -30,7 +30,7 @@
 
 namespace extmodem {
 
-agc::agc() : min_(0), max_(0), sigma1_(0), samples_history_(0), p_(0) {
+agc::agc() : sum_(0), min_(0), max_(0), sigma1_(0), samples_history_(0), p_(0) {
 	
 }
 

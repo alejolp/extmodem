@@ -31,10 +31,12 @@
 #include <cstdarg>
 
 int verbprintf(int log_level, const char* fmt, ...) {
+#ifndef __COVERITY__ 
 	(void)log_level;
 	va_list vl;
 	va_start(vl, fmt);
 	return vfprintf(stderr, fmt, vl);
+#endif
 }
 
 

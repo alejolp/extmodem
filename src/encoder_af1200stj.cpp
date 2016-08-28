@@ -47,6 +47,14 @@
 namespace extmodem {
 
 encoder_af1200stj::encoder_af1200stj() {
+	tx_symbol_phase = 0;
+	tx_dds_phase = 0;
+	sample_rate_ = 0;
+	phase_inc_f0 = 0;
+	phase_inc_f1 = 0;
+	phase_inc_symbol = 0;
+	tx_last_symbol = 0;
+	tx_stuff_count = 0;
 	out_queue_ptr_ = 0;
 }
 

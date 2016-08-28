@@ -45,7 +45,7 @@ public:
 
 class ptt_dummy : public ptt {
 public:
-	ptt_dummy() {}
+	ptt_dummy() : state_(0) {}
 	virtual ~ptt_dummy();
 
 	virtual int init(const char* fname);

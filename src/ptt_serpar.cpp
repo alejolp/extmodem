@@ -261,14 +261,15 @@ ptt_gpio_unix::~ptt_gpio_unix() {
 }
 
 int ptt_gpio_unix::init(const char* fname) {
-  strcpy(gpio_pin_, fname);
-  sprintf(gpio_pin_, "/sys/class/gpio/%s/value", fname);
+  gpio_pin_ = "/sys/class/gpio/";
+  gpio_pin_ += fname;
+  gpio_pin_ += "/value";
   return 1;
 }
 
 void ptt_gpio_unix::set_tx(int tx) {
   state_ = !!tx;
-  int fd = open(gpio_pin_, O_WRONLY);
+  int fd = open(gpio_pin_.c_str(), O_WRONLY);
   if (fd < 0) {
     std::string ctx = "open() fname: ";
     ctx += gpio_pin_;

@@ -163,17 +163,21 @@ namespace {
 		return sum(x.data(), x.size(), j);
 	}
 
+#if 0
 	float round(float d)
 	{
 	  return (float)std::floor(d + 0.5);
 	}
-
+#endif
+	
 	double round(double d)
 	{
 	  return std::floor(d + 0.5);
 	}
 }
+
 decoder_af1200stj::decoder_af1200stj(modem* em) : em_(em) {}
+
 decoder_af1200stj::~decoder_af1200stj() {}
 
 void decoder_af1200stj::init(audiosource* a) {

@@ -41,64 +41,68 @@
 using namespace extmodem;
 
 int main(int argc, char **argv) {
-	config* cfg = config::Instance();
+	try {
+		config* cfg = config::Instance();
 
-	cfg->init(argc, argv);
+		cfg->init(argc, argv);
 
-	if (cfg->is_help()) {
-		return 0;
-	}
+		if (cfg->is_help()) {
+			return 0;
+		}
 
-	int i;
-	boost::shared_ptr<modem> em(new modem());
-	boost::shared_ptr<audiosource> as;
+		int i;
+		boost::shared_ptr<modem> em(new modem());
+		boost::shared_ptr<audiosource> as;
 
-	if (cfg->audio_backend() == "null") {
-		as.reset(new audiosource_null(cfg->sample_rate()));
-	} else if (cfg->audio_backend() == "loopback") {
-		as.reset(new audiosource_loopback(cfg->sample_rate()));
-	} else if (cfg->audio_backend() == "wave") {
-		as.reset(new audiosource_wave(cfg->sample_rate()));
-	} else if (cfg->audio_backend() == "portaudio") {
+		if (cfg->audio_backend() == "null") {
+			as.reset(new audiosource_null(cfg->sample_rate()));
+		} else if (cfg->audio_backend() == "loopback") {
+			as.reset(new audiosource_loopback(cfg->sample_rate()));
+		} else if (cfg->audio_backend() == "wave") {
+			as.reset(new audiosource_wave(cfg->sample_rate()));
+		} else if (cfg->audio_backend() == "portaudio") {
 #ifdef PORTAUDIO_FOUND
-		as.reset(new audiosource_portaudio(cfg->sample_rate()));
+			as.reset(new audiosource_portaudio(cfg->sample_rate()));
 #else
-		std::cerr << "ERROR: PORTAUDIO support not compiled" << std::endl;
-		return 1;
+			std::cerr << "ERROR: PORTAUDIO support not compiled" << std::endl;
+			return 1;
 #endif
-	} else if (cfg->audio_backend() == "alsa") {
+		} else if (cfg->audio_backend() == "alsa") {
 #if ALSA_FOUND
-		as.reset(new audiosource_alsa(cfg->sample_rate()));
+			as.reset(new audiosource_alsa(cfg->sample_rate()));
 #else
-		std::cerr << "ERROR: ALSA support not compiled" << std::endl;
-		return 1;
+			std::cerr << "ERROR: ALSA support not compiled" << std::endl;
+			return 1;
 #endif
 	} else {
-		std::cerr << "ERROR: Invalid audio backend" << std::endl;
-		return 1;
+			std::cerr << "ERROR: Invalid audio backend" << std::endl;
+			return 1;
 	}
 
-	if (cfg->debug()) {
-		std::cerr << "Starting extmodem ... " << std::endl;
+		if (cfg->debug()) {
+			std::cerr << "Starting extmodem ... " << std::endl;
+		}
+
+		em->set_audiosource(as);
+
+		for (i = 0; i < cfg->in_chan_count(); ++i) {
+			em->add_decoder(decoder_ptr(new decoder_dtmf(em.get())), i);
+			em->add_decoder(decoder_ptr(new decoder_af1200mm(em.get())), i);
+			em->add_decoder(decoder_ptr(new decoder_af1200stj(em.get())), i);
+		}
+
+		em->set_encoder(encoder_ptr(new encoder_af1200stj()));
+
+		if (cfg->debug()) {
+			std::cerr << "Started!" << std::endl;
+		}
+
+		as->loop_async();
+
+		em->start_and_run();
+	} catch (std::exception& e) {
+		std::cerr << "exception: " << e.what() << std::endl;
 	}
-
-	em->set_audiosource(as);
-
-	for (i = 0; i < cfg->in_chan_count(); ++i) {
-		em->add_decoder(decoder_ptr(new decoder_dtmf(em.get())), i);
-		em->add_decoder(decoder_ptr(new decoder_af1200mm(em.get())), i);
-		em->add_decoder(decoder_ptr(new decoder_af1200stj(em.get())), i);
-	}
-
-	em->set_encoder(encoder_ptr(new encoder_af1200stj()));
-
-	if (cfg->debug()) {
-		std::cerr << "Started!" << std::endl;
-	}
-
-	as->loop_async();
-
-	em->start_and_run();
 
 	return 0;
 }
