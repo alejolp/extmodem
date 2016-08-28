@@ -30,9 +30,10 @@
 
  	void audiosource_alsa::init() {
  		int err;
- 		std::string device = config::Instance()->alsa_device();
+ 		std::string in_device = config::Instance()->alsa_in_device();
+ 		std::string out_device = config::Instance()->alsa_out_device();
 
- 		if ((err = snd_pcm_open(&p_handle_, device.c_str(), SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
+ 		if ((err = snd_pcm_open(&p_handle_, out_device.c_str(), SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
  			std::cerr << "snd_pcm_open playback error: " << snd_strerror(err) << std::endl;
  			close();
  			throw audiosourceexception("snd_pcm_open");
@@ -52,7 +53,7 @@
 
  		snd_pcm_hw_params_t *hw_params;
 
- 		if ((err = snd_pcm_open(&c_handle_, device.c_str(), SND_PCM_STREAM_CAPTURE, 0)) < 0) {
+ 		if ((err = snd_pcm_open(&c_handle_, in_device.c_str(), SND_PCM_STREAM_CAPTURE, 0)) < 0) {
  			std::cerr << "snd_pcm_open capture error: " << snd_strerror(err) << std::endl;
  			close();
  			throw audiosourceexception("snd_pcm_open");
@@ -272,6 +273,12 @@ void audiosource_alsa::loop_async_thread_play() {
 	}
 
 	close();
+}
+
+void audiosource_alsa::list_devices() {
+	std::cerr << "UNIMPLEMENTED. Use in the command line: " << std::endl;
+	std::cerr << "  aplay -L # to list output devices" << std::endl;
+	std::cerr << "  arecord -L # to list input devices" << std::endl;
 }
 
 } /* namespace extmodem */

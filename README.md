@@ -45,13 +45,16 @@ Open a new terminal (Start-Execute-"cmd" on windows) and ask for the program's h
       -s [ --sample-rate ] arg (=22050) sample rate
       --in-chan arg (=2)                input channel count
       --out-chan arg (=2)               output channel count
-      --alsa-device arg (=default)      ALSA device string
       --frames-per-buffer arg (=8192)   frames per buffer, bigger increases latency
       --hamlib-model arg (=-1)          hamlib Rig Model, -1 for auto detection
       --audio-mult-factor arg (=1)      Audio multiplication factor as float
       --enabled-in-channels arg (=-1)   Enabled input channels as a bitfield (1: 
                                         left, 2: right, 3: both), -1 for all
       --backend-wave-in-file arg        Backend WAVE: input file
+      --alsa-in-dev arg (=default)      ALSA device string, only for ALSA backend 
+                                        (not PortAudio!)
+      --alsa-out-dev arg (=default)     ALSA device string, only for ALSA backend 
+                                        (not PortAudio!)
       --pa-in-dev arg (=-1)             PortAudio input device id number. See 
                                         --list-devices
       --pa-out-dev arg (=-1)            PortAudio output device id number. See 
@@ -68,21 +71,27 @@ Extmodem provides a DTMF decoder for testing. You can use your handheld radio to
 
 ### Selecting the sound device to use.
 
-Using the alsa backend you can use the --alsa-device command line option to select another sound device, ie, hw:1. This option only works with the ALSA backend.
+Using the ALSA backend you can use the --alsa-in-dev and --alsa-out-dev command line options to select specific input and output sound devices, ie, hw:1,0. This option only works with the ALSA backend, not PortAudio backend. To get a list of ALSA PCM input and output devices you can use the aplay and arecord ALSA command line utilities:
 
-The portaudio backend always use the default sound card, which in turn by default uses the default ALSA device. To select a different ALSA device you should edit your asoundrc ALSA file. For example:
+    $ arecord -L
+    $ aplay -L
 
-    # cat /etc/asound.conf 
+Use the complete line header as a device string. For example:
 
-    pcm.!default {
-            type hw
-            card 1
-    }
+    $ arecord -L
+    plughw:CARD=C920,DEV=0
+        HD Pro Webcam C920, USB Audio
+        Hardware device with all software conversions
+    
+    # ./extmodem --audio-backend=alsa --alsa-in-dev "plughw:CARD=C920,DEV=0"
 
-    ctl.!default {
-            type hw           
-            card 1
-    }
+The Portaudio backend uses by default the default sound device, which is usually the default ALSA device. To select a different PortAudio device you can first get a list of devices with the -L option:
+
+    $ ./extmodem --audio-backend=portaudio --list-devices
+
+Take note of the Device NUMBER and then use that number with the --pa-in-dev and --pa-out-dev options:
+
+    $ ./extmodem --audio-backend=portaudio --pa-in-dev=44 --pa-out-dev=45
 
 ### APRX - TCP Kiss Support
 
@@ -102,7 +111,7 @@ You can use UI-VIEW32 with extmodem. This program supports a preliminary version
 
 This is my command line on the Raspberry Pi. I am using an external USB sound card interface:
 
-    ./extmodem --ptt-mode null --audio-backend alsa --alsa-device "hw:1" -s 44100 --out-chan 2 --in-chan 1 --debug
+    ./extmodem --ptt-mode null --audio-backend alsa --alsa-in-dev "hw:1" -s 44100 --out-chan 2 --in-chan 1 --debug
 
 Build from source
 -----------------

@@ -25,6 +25,8 @@ public:
 
 	virtual void loop_async();
 
+	virtual void list_devices();
+	
 private:
 
 	void loop_async_thread_play();

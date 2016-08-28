@@ -59,7 +59,8 @@ public:
 	int sample_rate() const { return sample_rate_; }
 	int in_chan_count() const { return in_channels_count_; }
 	int out_chan_count() const { return out_channels_count_; }
-	std::string alsa_device() const { return alsa_device_; }
+	std::string alsa_in_device() const { return alsa_in_device_; }
+	std::string alsa_out_device() const { return alsa_out_device_; }
 	int frames_per_buff() const { return frames_per_buff_; }
 	int hamlib_model() const { return hamlib_model_; }
 	float audio_mult_factor() const { return audio_mult_factor_; }
@@ -86,7 +87,8 @@ private:
 	int sample_rate_{};
 	int in_channels_count_{};
 	int out_channels_count_{};
-	std::string alsa_device_;
+	std::string alsa_in_device_;
+	std::string alsa_out_device_;
 	int frames_per_buff_{};
 	int hamlib_model_{};
 	float audio_mult_factor_{};
