@@ -102,17 +102,6 @@ void audiosource_portaudio::init() {
 		throw audiosourceexception("Pa_Initialize");
 	}
 
-	PaHostApiIndex api_idx;
-
-	const PaHostApiInfo* info = Pa_GetHostApiInfo(Pa_GetDefaultHostApi());
-
-	std::cerr << "Default device: " << info->name << std::endl;
-
-	for (api_idx = 0; api_idx < Pa_GetHostApiCount(); ++api_idx) {
-		info = Pa_GetHostApiInfo(api_idx);
-		std::cerr << "device " << api_idx << ": " << info->name << std::endl;
-	}
-
 	//int frames_per_buffer = get_sample_rate();
 	int frames_per_buffer = config::Instance()->frames_per_buff();
 
@@ -121,25 +110,42 @@ void audiosource_portaudio::init() {
 	 * bug on PortAudio.
 	 */
 
+	PaStreamParameters input_params;
+	PaStreamParameters output_params;
+
+	input_params.device = (config::Instance()->portaudio_input_device() < 0) ? Pa_GetDefaultInputDevice() : config::Instance()->portaudio_input_device();
+	input_params.channelCount = get_in_channel_count();
+	input_params.sampleFormat = paFloat32;
+	input_params.suggestedLatency = 1;
+	input_params.hostApiSpecificStreamInfo = 0;
+
+	output_params.device = (config::Instance()->portaudio_output_device() < 0) ? Pa_GetDefaultOutputDevice() : config::Instance()->portaudio_output_device();
+	output_params.channelCount = get_out_channel_count();
+	output_params.sampleFormat = paFloat32;
+	output_params.suggestedLatency = 1;
+	output_params.hostApiSpecificStreamInfo = 0;
+
+	/* frames per buffer, i.e. the number
+	   of sample frames that PortAudio will
+	   request from the callback. Many apps
+	   may want to use
+	   paFramesPerBufferUnspecified, which
+	   tells PortAudio to pick the best,
+	   possibly changing, buffer size.*/
+
     /* Open an audio I/O stream. */
-    err = Pa_OpenDefaultStream( &stream_in,
-    							get_in_channel_count(),          /* input channels */
-                                0,          /* output */
-                                paFloat32,  /* 32 bit floating point output */
+    err = Pa_OpenStream( &stream_in,
+    							&input_params,
+    							0,
                                 get_sample_rate(),
-                                frames_per_buffer, /* frames per buffer, i.e. the number
-                                                   of sample frames that PortAudio will
-                                                   request from the callback. Many apps
-                                                   may want to use
-                                                   paFramesPerBufferUnspecified, which
-                                                   tells PortAudio to pick the best,
-                                                   possibly changing, buffer size.*/
-                                portaudio_in_callback, /* this is your callback function */
-                                static_cast<void*>(this) ); /*This is a pointer that will be passed to
-                                                   your callback*/
+                                frames_per_buffer, 
+                                paNoFlag,
+                                portaudio_in_callback,
+                                static_cast<void*>(this) );
+
 	if( err != paNoError ) {
 		std::cerr << "PortAudio in error: " << Pa_GetErrorText( err ) << std::endl;
-		throw audiosourceexception("Pa_OpenDefaultStream");
+		throw audiosourceexception("Pa_OpenStream");
 	}
 
 	err = Pa_StartStream( stream_in );
@@ -149,24 +155,18 @@ void audiosource_portaudio::init() {
 	}
 
     /* Open an audio I/O stream. */
-    err = Pa_OpenDefaultStream( &stream_out,
-    							0,          /* input channels */
-    							get_out_channel_count(),          /* output */
-                                paFloat32,  /* 32 bit floating point output */
+    err = Pa_OpenStream( &stream_out,
+    							0,
+    							&output_params,
                                 get_sample_rate(),
-                                frames_per_buffer, /* frames per buffer, i.e. the number
-                                                   of sample frames that PortAudio will
-                                                   request from the callback. Many apps
-                                                   may want to use
-                                                   paFramesPerBufferUnspecified, which
-                                                   tells PortAudio to pick the best,
-                                                   possibly changing, buffer size.*/
-                                portaudio_out_callback, /* this is your callback function */
-                                static_cast<void*>(this) ); /*This is a pointer that will be passed to
-                                                   your callback*/
+                                frames_per_buffer, 
+                                paNoFlag,
+                                portaudio_out_callback,
+                                static_cast<void*>(this) );
+
 	if( err != paNoError ) {
 		std::cerr << "PortAudio out error: " << Pa_GetErrorText( err ) << std::endl;
-		throw audiosourceexception("Pa_OpenDefaultStream");
+		throw audiosourceexception("Pa_OpenStream");
 	}
 
 	err = Pa_StartStream( stream_out );
@@ -210,6 +210,31 @@ void audiosource_portaudio::close() {
 
 void audiosource_portaudio::loop_async() {
 
+}
+
+void audiosource_portaudio::list_devices() {
+	PaHostApiIndex api_idx;
+
+	const PaHostApiInfo* info = Pa_GetHostApiInfo(Pa_GetDefaultHostApi());
+
+	std::cerr << "Default Host API: " << Pa_GetDefaultHostApi() << "; " << info->name << std::endl;
+
+	for (api_idx = 0; api_idx < Pa_GetHostApiCount(); ++api_idx) {
+		info = Pa_GetHostApiInfo(api_idx);
+		std::cerr << "   Host API " << api_idx << ": " << info->name << std::endl;
+	}
+
+	std::cerr << "PortAudio device_count=" << Pa_GetDeviceCount() << std::endl;
+	std::cerr << "PortAudio DefaultInputDevice=" << Pa_GetDefaultInputDevice() << std::endl;
+	std::cerr << "PortAudio DefaultOutputDevice=" << Pa_GetDefaultOutputDevice() << std::endl;
+
+	for (PaDeviceIndex i = 0; i < Pa_GetDeviceCount(); ++i) {
+		const PaDeviceInfo *devinfo = Pa_GetDeviceInfo(i);
+		std::cerr << "Device " << i << ": " << devinfo->name << std::endl;
+		std::cerr << "   MaxInCH=" << devinfo->maxInputChannels 
+			<< " MaxOutCH=" << devinfo ->maxOutputChannels 
+			<< " defaultSampleRate=" << devinfo ->defaultSampleRate << std::endl;
+	}
 }
 
 } /* namespace extmodem */

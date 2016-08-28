@@ -74,10 +74,15 @@ int main(int argc, char **argv) {
 			std::cerr << "ERROR: ALSA support not compiled" << std::endl;
 			return 1;
 #endif
-	} else {
-			std::cerr << "ERROR: Invalid audio backend" << std::endl;
-			return 1;
-	}
+		} else {
+				std::cerr << "ERROR: Invalid audio backend" << std::endl;
+				return 1;
+		}
+
+		if (cfg->list_devices()) {
+			as->list_devices();
+			return 0;
+		}
 
 		if (cfg->debug()) {
 			std::cerr << "Starting extmodem ... " << std::endl;

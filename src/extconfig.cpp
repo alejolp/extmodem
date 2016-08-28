@@ -50,6 +50,7 @@ void config::init(int argc, char** argv) {
 	    ("help,h", "produce help message")
 	    ("debug,d", "produce debug messages")
 	    ("debugaudio,a", "produce audio debug information")
+	    ("list-devices,L", "list audio source devices and exit")
 	    ("config-file", po::value<std::string>(), "configuration file name")
 	    ("audio-backend", po::value<std::string>(&audio_backend_)->default_value("portaudio"), "Audio backend: alsa,loopback,portaudio,wave,null")
 	    ("kiss-tcp-port", po::value<int>(&kiss_tcp_port_)->default_value(6666), "set KISS TCP listening port")
@@ -67,6 +68,8 @@ void config::init(int argc, char** argv) {
 		("audio-mult-factor", po::value<float>(&audio_mult_factor_)->default_value(1.0f), "Audio multiplication factor as float")
 		("enabled-in-channels", po::value<int>(&enabled_channels_)->default_value(-1), "Enabled input channels as a bitfield (1: left, 2: right, 3: both), -1 for all")
 		("backend-wave-in-file", po::value<std::string>(&wave_file_in_)->default_value(""), "Backend WAVE: input file")
+	    ("pa-in-dev", po::value<int>(&portaudio_input_device_)->default_value(-1), "PortAudio input device id number. See --list-devices")
+	    ("pa-out-dev", po::value<int>(&portaudio_output_device_)->default_value(-1), "PortAudio output device id number. See --list-devices")
 	;
 
 	p_.add("config-file", -1);
@@ -86,6 +89,7 @@ void config::init(int argc, char** argv) {
 
 	debug_ = (vm.count("debug") > 0);
 	debugaudio_ = (vm.count("debugaudio") > 0);
+	listdevices_ = (vm.count("list-devices") > 0);
 }
 
 

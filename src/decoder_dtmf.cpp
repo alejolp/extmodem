@@ -117,8 +117,13 @@ int decoder_dtmf::process_block()
 	memmove(dtmf.energy+1, dtmf.energy,
 		sizeof(dtmf.energy) - sizeof(dtmf.energy[0]));
 	dtmf.energy[0] = 0;
+#if 0
 	memmove(dtmf.tenergy+1, dtmf.tenergy,
 		sizeof(dtmf.tenergy) - sizeof(dtmf.tenergy[0]));
+#else
+	for (i = 1; i < 4; ++i)
+		memmove(dtmf.tenergy+4-i, dtmf.tenergy+4-i-1, sizeof(dtmf.tenergy[0]));
+#endif
 	memset(dtmf.tenergy, 0, sizeof(dtmf.tenergy[0]));
 	tote *= (BLOCKNUM*blocklen_*0.5);  /* adjust for block lengths */
 	/*

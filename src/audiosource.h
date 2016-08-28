@@ -47,6 +47,8 @@ public:
 
 	virtual void loop_async() = 0;
 
+	virtual void list_devices();
+	
 	void set_listener(audiosourcelistener* p) { listener_ = p; }
 	audiosourcelistener* get_listener() const { return listener_; }
 

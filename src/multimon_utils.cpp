@@ -36,6 +36,8 @@ int verbprintf(int log_level, const char* fmt, ...) {
 	va_list vl;
 	va_start(vl, fmt);
 	return vfprintf(stderr, fmt, vl);
+#else
+	return 0;
 #endif
 }
 

@@ -18,6 +18,8 @@
  *      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <iostream>
+ 
 #include "audiosource.h"
 
 #include "extconfig.h"
@@ -37,6 +39,10 @@ int audiosource::get_in_channel_count() {
 
 int audiosource::get_out_channel_count() {
 	return config::Instance()->out_chan_count();
+}
+
+void audiosource::list_devices() {
+	std::cerr << "UNIMPLEMENTED" << std::endl;
 }
 
 } /* namespace extmodem */

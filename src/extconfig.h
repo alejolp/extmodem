@@ -55,6 +55,7 @@ public:
 	int tx_delay() const { return tx_delay_; }
 	int tx_tail() const { return tx_tail_; }
 	bool debug() const { return debug_; }
+	bool list_devices() const { return listdevices_; }
 	int sample_rate() const { return sample_rate_; }
 	int in_chan_count() const { return in_channels_count_; }
 	int out_chan_count() const { return out_channels_count_; }
@@ -65,6 +66,8 @@ public:
 	int enabled_channels() const { return enabled_channels_; }
 	std::string wave_file_in() const { return wave_file_in_; }
 	bool debugaudio() const { return debugaudio_; }
+	int portaudio_input_device() const { return portaudio_input_device_; }
+	int portaudio_output_device() const { return portaudio_output_device_; }
 
 private:
 	po::options_description desc;
@@ -79,6 +82,7 @@ private:
 	int tx_delay_{};
 	int tx_tail_{};
 	bool debug_{};
+	bool listdevices_{};
 	int sample_rate_{};
 	int in_channels_count_{};
 	int out_channels_count_{};
@@ -89,6 +93,8 @@ private:
 	int enabled_channels_{};
 	std::string wave_file_in_;
 	bool debugaudio_{};
+	int portaudio_input_device_{};
+	int portaudio_output_device_{};
 };
 
 } /* namespace extmodem */
