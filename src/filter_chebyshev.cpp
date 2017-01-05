@@ -129,6 +129,8 @@ void chebyshev_filter_calc(
 
     A.resize(23);
     B.resize(23);
+    TA.resize(23);
+    TB.resize(23);
 
     A[2] = 1.0;
     B[2] = 1.0;
@@ -146,7 +148,7 @@ void chebyshev_filter_calc(
         }
 
         //for I in range(2, 23):
-        for (int I = 0; I < 23; ++I) {
+        for (int I = 2; I < 23; ++I) {
             A[I] = A0 * TA[I] + A1 * TA[I-1] + A2 * TA[I-2];
             B[I] = TB[I] - B1 * TB[I-1] - B2 * TB[I-2];
         }
@@ -191,16 +193,17 @@ chebyshev_filter::chebyshev_filter(
    idx_(0)
 {
     chebyshev_filter_calc(freq_, highpass_, ripple_, number_of_poles_, A_, B_);
-    X_.resize(2 * number_of_poles_ + 2);
-    Y_.resize(2 * number_of_poles_ + 2);
+    X_.resize(number_of_poles_ + 1);
+    Y_.resize(number_of_poles_ + 1);
 }
 
+#if 0
 float chebyshev_filter::sample(float v) {
     size_t k;
 
     idx_++;
-    X_[idx_] = v;
-    Y_[idx_] = 0;
+    X_[idx_ % X_.size()] = v;
+    Y_[idx_ % Y_.size()] = 0;
 
     for (int i = number_of_poles_; i < (int)X_.size(); ++i) {
         for (k = 0; k <= number_of_poles_; ++k) {
@@ -212,5 +215,90 @@ float chebyshev_filter::sample(float v) {
         }
     }
 
-    return Y_[idx_];
+    return Y_[idx_ % Y_.size()];
 }
+#endif
+
+#if 1
+float chebyshev_filter::sample(float v) {
+    size_t k;
+
+    for (k = 1; k < X_.size(); ++k) {
+        X_[k-1] = X_[k];
+        Y_[k-1] = Y_[k];
+    }
+
+    X_[X_.size() - 1] = v;
+    Y_[X_.size() - 1] = 0;
+
+    //for (int i = number_of_poles_; i < (int)X_.size(); ++i) 
+    int i = number_of_poles_;
+    {
+        //for k in range(0, NP+1):
+        for (k = 0; k <= number_of_poles_; ++k)
+            Y_[i] += A_[k] * X_[i-k];
+        //for k in range(1, NP+1):
+        for (k = 1; k <= number_of_poles_; ++k)
+            Y_[i] += B_[k] * Y_[i-k];
+    }
+
+    return Y_[X_.size() - 1];
+}
+#endif
+
+#ifdef FILTER_CHEB_TEST
+
+#include <iostream>
+
+int main(int argc, char const *argv[])
+{
+    (void)argc;
+    (void)argv;
+
+    std::vector<float> X;
+    int i = 0;
+
+    for (i = 0; i < 30; ++i)
+        X.push_back(0);
+    
+    X.push_back(1);     
+
+    for (i = 0; i < 300; ++i)
+        X.push_back(0);
+
+    /* ************ **/
+
+    std::vector<float> Y;
+    std::vector<float> A;
+    std::vector<float> B;
+
+    chebyshev_filter_calc(0.1, 0, 0, 5, A, B);
+
+    Y.resize(X.size());
+
+    apply_filter(X, A, B, 5, Y);
+
+    for (i=0; i < (int)Y.size(); ++i)
+        std::cout << Y[i] << std::endl;
+
+    chebyshev_filter F(0.1, false, 0, 5);
+
+    std::cout << "************************************************" << std::endl;
+
+    i = 0;
+    float sq = 0;
+
+    for (i = 0; i < (int)X.size(); ++ i) {
+        float e = F.sample(X[i]);
+        sq += (e - Y[i]) * (e - Y[i]);
+        std::cout << e << std::endl;
+    }
+
+    std::cout << "************************************************" << std::endl;
+
+    std::cout << "error: " << sq << std::endl;
+
+    return 0;
+}
+
+#endif
