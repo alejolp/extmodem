@@ -127,9 +127,12 @@ void modem::input_callback(audiosource* a, const float* buffer, unsigned long le
 				for (k = 0, p = ch_idx; p < length; ++k, p += channel_count) {
 					tmpdata[k] = buffer[p] * mult_factor;
 
+#if 0
 					agcs_[ch_idx].sample(tmpdata[k]);
+#endif
 				}
 
+#if 0
 				agcs_[ch_idx].update();
 
 				if (cfg->debugaudio()) {
@@ -142,7 +145,7 @@ void modem::input_callback(audiosource* a, const float* buffer, unsigned long le
 						<< " stddev=" << std::setprecision(6) << agcs_[ch_idx].stddev()
 						<< std::endl;
 				}
-
+#endif
 				for (deco_idx = 0; deco_idx < decoders_[ch_idx].size(); ++deco_idx) {
 					decoders_[ch_idx][deco_idx]->input_callback(a, tmpdata.data(), k);
 				}

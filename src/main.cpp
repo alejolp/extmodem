@@ -32,6 +32,7 @@
 #include "decoder_af1200mm.h"
 #include "decoder_af1200stj.h"
 #include "decoder_af1200fsk.h"
+#include "decoder_debug.h"
 
 #include "encoder_af1200stj.h"
 
@@ -97,6 +98,10 @@ int main(int argc, char **argv) {
 			em->add_decoder(decoder_ptr(new decoder_af1200mm(em.get())), i);
 			em->add_decoder(decoder_ptr(new decoder_af1200stj(em.get())), i);
 			em->add_decoder(decoder_ptr(new decoder_af1200fsk(em.get())), i);
+
+			if (cfg->debugaudio()) {
+				em->add_decoder(decoder_ptr(new decoder_debug(em.get())), i);
+			}
 		}
 
 		em->set_encoder(encoder_ptr(new encoder_af1200stj()));
