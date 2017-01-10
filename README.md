@@ -12,9 +12,13 @@ By Alejandro Santos, LU4EXT / HB3YNQ. alejolp@gmail.com.
 
 Web page (old): http://extradio.sourceforge.net/extmodem.html
 
-This is a modem for AFSK AX25 packet (1200 bps APRS compatible). It is capable to both send and receive packets. The main feature of this program is that it is currently running three different demodulators in parallel, increasing the quality of reception. The first modem is Thomas Sailer's multimon, the other two are described by Sivan Toledo in this QEX article: http://www.tau.ac.il/~stoledo/Bib/Pubs/QEX-JulAug-2012.pdf
+This is a modem for AFSK AX25 packet (1200 bps APRS compatible). It is capable to both send and receive packets. The main feature of this program is that it is currently running three different demodulators in parallel, increasing the quality of reception. 
 
-Since the core of the extmodem runs the same algorithm as javAX25, the number of demodulated packets should be better than soundmodem. 
+* The first modem is Thomas Sailer's multimon-
+* The second is described by Sivan Toledo in this QEX article: http://www.tau.ac.il/~stoledo/Bib/Pubs/QEX-JulAug-2012.pdf
+* The third is an experimental FSK delay line demodulator.
+
+Therefore, the number of demodulated packets is very good.
 
 Windows Files
 -------------
@@ -27,7 +31,7 @@ Usage
 Open a new terminal (Start-Execute-"cmd" on windows) and ask for the program's help:
 
     extmodem.exe --help
-    
+        
     Allowed options:
       -h [ --help ]                     produce help message
       -d [ --debug ]                    produce debug messages
@@ -51,23 +55,25 @@ Open a new terminal (Start-Execute-"cmd" on windows) and ask for the program's h
       --enabled-in-channels arg (=-1)   Enabled input channels as a bitfield (1: 
                                         left, 2: right, 3: both), -1 for all
       --backend-wave-in-file arg        Backend WAVE: input file
-      --alsa-in-dev arg (=default)      ALSA device string, only for ALSA backend 
-                                        (not PortAudio!)
-      --alsa-out-dev arg (=default)     ALSA device string, only for ALSA backend 
-                                        (not PortAudio!)
+      --alsa-in-dev arg (=default)      ALSA input device string, only for ALSA 
+                                        backend (not PortAudio!)
+      --alsa-out-dev arg (=default)     ALSA output device string, only for ALSA 
+                                        backend (not PortAudio!)
       --pa-in-dev arg (=-1)             PortAudio input device id number. See 
                                         --list-devices
       --pa-out-dev arg (=-1)            PortAudio output device id number. See 
                                         --list-devices
 
 
-You should at least set the PTT Port, Usually COMx on Windows and /dev/ttySX on Linux and Unix.
+You should at least set the PTT Port, Usually COMx on Windows and /dev/ttySX on Linux and Unix. You can run extmodem in receive-only mode by setting a dummy PTT mode with the argument --ptt-mode null.
 
 The program prints the received packets on the screen having the -d switch.
 
 ### Testing with DTMF
 
 Extmodem provides a DTMF decoder for testing. You can use your handheld radio to test the decoder by sending DTMF codes. You should be able to see on the screen the decoded DTMF code.
+
+Also, using the --debugaudio switch you can see some simple statistics about the received audio.
 
 ### Selecting the sound device to use.
 
@@ -161,7 +167,7 @@ License
 This program borrows code from Sivan Toledo's javAX25 and Thomas Sailer's multimon. Thank you folks!
 
 > 
->     Copyright (C) 2013 Alejandro Santos LU4EXT, alejolp@gmail.com.
+>     Copyright (C) 2013-2017 Alejandro Santos LU4EXT, alejolp@gmail.com.
 > 
 >     This program is free software; you can redistribute it and/or modify
 >     it under the terms of the GNU General Public License as published by

@@ -125,7 +125,7 @@ void modem::input_callback(audiosource* a, const float* buffer, unsigned long le
 			if (enabled_channels & (1 << ch_idx)) {
 				/* Copy each channel data contiguously */
 				for (k = 0, p = ch_idx; p < length; ++k, p += channel_count) {
-					tmpdata[k] = buffer[p] * mult_factor;
+					tmpdata[k] = buffer[p];
 
 #if 0
 					agcs_[ch_idx].sample(tmpdata[k]);
