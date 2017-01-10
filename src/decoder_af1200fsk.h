@@ -49,21 +49,23 @@ private:
 
     hdlc hdlc_;
 
-    std::vector<float> delayline;
+    typedef float fptype;
+
+    std::vector<fptype> delayline;
     int delaylength;
     size_t delayidx;
 
     size_t sample_counter;
     size_t sample_last_change;
-    float last_filt_samp;
+    fptype last_filt_samp;
 
-    float f1;
-    float f2;
-    float fcfilt;
-    float bps;
+    fptype f1;
+    fptype f2;
+    fptype fcfilt;
+    fptype bps;
     int sample_rate;
 
-    std::unique_ptr< chebyshev_filter<float> > lpf;
+    std::unique_ptr< chebyshev_filter<fptype> > lpf;
 };
 
 }

@@ -18,9 +18,12 @@
  *      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <iostream>
+
 #include "decoder_af1200fsk.h"
 #include "audiosource.h"
 #include "extmodem.h"
+#include "extconfig.h"
 
 
 namespace extmodem {
@@ -41,7 +44,7 @@ decoder_af1200fsk::decoder_af1200fsk(modem* em)
 
     sample_rate = em->get_audiosource()->get_sample_rate();
 
-    lpf.reset(new chebyshev_filter<float>(sample_rate / fcfilt, false, 0, 5));
+    lpf.reset(new chebyshev_filter<fptype>(fcfilt / sample_rate, false, 0, 5));
 
     calc_delay_len();
 
@@ -63,19 +66,30 @@ void decoder_af1200fsk::input_callback(
     size_t k;
 
     for (k = 0; k < frameCount; ++k, ++sample_counter) {
-        float oldsample = delayline[delayidx % delayline.size()];
-        float newsample = input[k];
+        fptype oldsample = delayline[delayidx % delayline.size()];
+        fptype newsample = input[k];
 
         delayline[delayidx % delayline.size()] = newsample;
+        delayidx++;
 
-        float a = lpf->sample(oldsample * newsample);
+        fptype a = lpf->sample(oldsample * newsample);
 
         bool s1 = a > 0;
         bool s2 = last_filt_samp > 0;
 
         if (s1 != s2) {
             size_t d = (sample_counter - sample_last_change);
-            size_t e = std::round(d * bps / sample_rate);
+            int e = std::round(((fptype)d) * bps / sample_rate);
+
+#if 0
+            std::cout << " a " << a
+                << " last_filt_samp " << last_filt_samp
+                << " d " << d 
+                << " e " << e 
+                << " oldsample " << oldsample
+                << " newsample " << newsample
+                << std::endl;
+#endif
 
             sample_last_change = sample_counter;
             last_filt_samp = a;
@@ -84,23 +98,32 @@ void decoder_af1200fsk::input_callback(
                 hdlc_.rxbit(1);
             }
 
+
             hdlc_.rxbit(0);
+            
         }
     }
 }
 
 void decoder_af1200fsk::calc_delay_len() {
-    float maxdiff = 0;
+    fptype maxdiff = 0;
     int i;
     int bit_len = std::round(sample_rate / bps);
 
     for (i = 0; i < bit_len; ++i) {
-        float a = -std::cos(2 * M_PI * f1 * (i) / sample_rate) 
+        fptype a = -std::cos(2 * M_PI * f1 * (i) / sample_rate) 
             + std::cos(2 * M_PI * f2 * (i) / sample_rate);
         if (a > maxdiff) {
             maxdiff = a;
             delaylength = i;
         }
+    }
+
+    if (config::Instance()->debug()) {
+        std::cout << "maxdiff " << maxdiff 
+            << " delaylength " << delaylength 
+            << " sample_rate " << sample_rate 
+            << std::endl;
     }
 }
 
